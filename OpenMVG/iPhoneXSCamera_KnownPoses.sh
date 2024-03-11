@@ -29,21 +29,21 @@ INIT_F=4608
 # echo '\n 2. Executing Features Computation \n'
 # openMVG_main_ComputeFeatures -i $OUTPUT/sfm_data.json -o $MATCHES -m SIFT -f 1 -p HIGH -n 8
 
-# 3. Pair Generator
-echo ' \n 3. Executing Pair Generator \n'
-openMVG_main_PairGenerator -i $OUTPUT/sfm_data_common.json -o $MATCHES/parirs.bin -m CONTIGUOUS -c 30
+# # 3. Pair Generator
+# echo ' \n 3. Executing Pair Generator \n'
+# openMVG_main_PairGenerator -i $OUTPUT/sfm_data.json -o $MATCHES/parirs.bin -m CONTIGUOUS -c 30
 
-# 4. Matches Computation
-echo '\n 4. Executing Matches Computation \n'
-openMVG_main_ComputeMatches -i $OUTPUT/sfm_data_common.json -o $MATCHES/matches.putative.bin -p $MATCHES/parirs.bin -n AUTO
+# # 4. Matches Computation
+# echo '\n 4. Executing Matches Computation \n'
+# openMVG_main_ComputeMatches -i $OUTPUT/sfm_data.json -o $MATCHES/matches.putative.bin -p $MATCHES/parirs.bin -n AUTO
 
-# 5. Geometric Filtering
-echo '\n 5. Executing Geometric Filtering \n'
-openMVG_main_GeometricFilter -i $OUTPUT/sfm_data_common.json -m $MATCHES/matches.putative.bin -o $MATCHES/matches.f.bin -p $MATCHES/parirs.bin
+# # 5. Geometric Filtering
+# echo '\n 5. Executing Geometric Filtering \n'
+# openMVG_main_GeometricFilter -i $OUTPUT/sfm_data.json -m $MATCHES/matches.putative.bin -o $MATCHES/matches.f.bin -p $MATCHES/parirs.bin
 
 # 6. Compute Structure from Motion
 echo '\n 6. Executing Strucuture from Motion \n'
-openMVG_main_ComputeStructureFromKnownPoses -i $OUTPUT/sfm_data_common.json -m $MATCHES -o $RECONSTRUCTION/sfm_data_structure.bin -p $MATCHES/parirs.bin -f $MATCHES/matches.f.bin
+openMVG_main_ComputeStructureFromKnownPoses -i $OUTPUT/sfm_data.json -m $MATCHES -o $RECONSTRUCTION/sfm_data_structure.bin -T $OUTPUT/sfm_data_with_info.json -b # -p $MATCHES/parirs.bin -f $MATCHES/matches.f.bin
 
 # 7. New SfM data conversion to JSON
 echo '\n 7. Executing SfM data conversion to JSON \n'

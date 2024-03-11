@@ -1,31 +1,41 @@
-import numpy as np
+#Libraries
 import cv2
-import matplotlib.pyplot as plt
 import glob
 import pandas as pd
 import json
 import os
+import time
 
-# Path
-data_path = '/media/agv/JesusGTI/Calibration/iPhone_Recordings/C_chess/frames'
-# Number or corners along the x axes
+
+# Capture Info
+scene = 'C_Chess'
+camera = 'iPhone XS Max'
+
+# Paths
+main_path = '/media/agv/JesusGTI/Calibration'
+scene_path = f'{main_path}/iPhone_Recordings/C_chess/frames'
+savepath = f'{scene_path}/output/openCV_coords_acc.json'
+drawn_corners_path = f'{scene_path}/output/frames_with_corners_opencv'
+
+# Save Images with drawn corners?
+img_with_corners = False
+img_corners_show = False # Print every image with its drawn corners for 3s (can be change to wait key)
+
+# Number or corners along the x axes and y axes
 nCorners_x = 8
-# Number or corners along the y axes
 nCorners_y = 6
-# Array where the coordinates of the corners will be saved
-corners = 0
-fconers = False
-# Dataframe where coordinates of each image are saved
-coord_corners = pd.DataFrame()
+
 # Window size to process the subpixel analysis
 # Half of the side length of the search window. For example, if winSize=Size(5,5) , then a (5∗2+1)×(5∗2+1)=11×11 search window is used.
 subWin = (11, 11)
-# Path to the images and list it
-chess_images = glob.glob(f'{data_path}/*.png')
+
+# List the images (frames in this case)
+chess_images = glob.glob(f'{scene_path}/*.png')
+
 # Main JSON
 ref_points = {
-    "Record": 'C_Chess',
-    "Camera": 'iPhone XS Max',
+    "Record": scene,
+    "Camera": camera,
     "Corners": []
 }
 
@@ -42,19 +52,20 @@ for i in range(len(chess_images)):
     fconers, corners = cv2.findChessboardCorners(chess_board_image, (nCorners_x, nCorners_y), cv2.CALIB_CB_EXHAUSTIVE + cv2.CALIB_CB_ACCURACY) # cv2.CALIB_CB_FAST_CHECK
     # If found, draw corners
     if fconers == True:
-        # # Draw and display the corners
-        # cv2.drawChessboardCorners(chess_board_image, (nCorners_x, nCorners_y), corners, fconers)
-        # result_name = f'/media/agv/JesusGTI/Calibration/Images/corners/IMG_{str(i)}.png'
-        # cv2.imwrite(result_name, chess_board_image)
-        # cv2.imshow('img',chess_board_image)
-        # cv2.waitKey()
+        if img_with_corners:
+            # Draw and display the corners
+            cv2.drawChessboardCorners(chess_board_image, (nCorners_x, nCorners_y), corners, fconers)
+            cv2.imwrite(f'{drawn_corners_path}/IMG_{str(i)}.png', chess_board_image)
+            if img_corners_show:
+                cv2.imshow(f'{file} with corners',chess_board_image)
+                time.sleep(3)   #cv2.waitKey()
 
         # In ordert to maximize the precision of the coordinates a subpixel method is called
         cv2.cornerSubPix(gray, corners, subWin, (-1, -1), (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_COUNT, 30, 0.1));
         # print(f'The coordinates of each corner are:\n {corners}')
 
         # Now the coordinates are save into a JSON
-        with open(f'{data_path}/output/openCV_coords_acc.json', 'w') as f:
+        with open(savepath, 'w') as f:
             chess_coords = {
                     'filename': file,
                     'x': []

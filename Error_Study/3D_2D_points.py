@@ -5,8 +5,8 @@ import json
 dataset_path = '/media/agv/JesusGTI/Calibration/iPhone_Recordings/C_chess/frames/output'
 mvg_results_path = f'{dataset_path}/Reconstruction'
 sfm_data_file = f'{mvg_results_path}/sfm_data.json'
-cv_file = f'{dataset_path}/openCV_coords.json'
-savepath = f'{dataset_path}/3D_chesspoints_0_05_prueba.json'
+cv_file = f'{dataset_path}/openCV_coords_acc.json'
+savepath = f'{dataset_path}/3D_chesspoints_acc_0_05.json'
 
 # Read JSON files
 sfm_data = ''
@@ -48,11 +48,11 @@ frames = []
 coords_cv = []
 
 # Some frames are not in the OpenCV file
-for i in range(len(opencv_data)):
-    frames_cv.append(opencv_data[i]["filename"])
+for chessboard in opencv_data["Corners"]:
+    frames_cv.append(chessboard["filename"])
         
-for i in range(len(sfm_data["views"])):
-    aux = sfm_data["views"][i]["value"]["ptr_wrapper"]["data"]["filename"]        
+for view in sfm_data["views"]:
+    aux = view["value"]["ptr_wrapper"]["data"]["filename"]        
 
     # Index to obtain the 3D coordinate if its all ready listed.
     try:
@@ -61,9 +61,9 @@ for i in range(len(sfm_data["views"])):
         match = 'None'
 
     if type(match) == int: 
-        frames_mvg.append(sfm_data["views"][i]["key"])
-        frames.append(sfm_data["views"][match]["value"]["ptr_wrapper"]["data"]["filename"])
-        coords_cv.append(opencv_data[match]["x"])
+        frames_mvg.append(view["key"])
+        frames.append(view["value"]["ptr_wrapper"]["data"]["filename"])
+        coords_cv.append(opencv_data["Corners"][match]["x"])
 
 # Chessboard search in sfm_data file
 with open(savepath, 'w') as f:
