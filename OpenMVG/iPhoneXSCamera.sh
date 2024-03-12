@@ -30,19 +30,19 @@ openMVG_main_ComputeFeatures -i $OUTPUT/sfm_data.json -o $MATCHES -m SIFT -f 1 -
 
 # 3. Pair Generator
 echo ' \n 3. Executing Pair Generator \n'
-openMVG_main_PairGenerator -i $OUTPUT/sfm_data.json -o $MATCHES/parirs.bin -m CONTIGUOUS -c 3
+openMVG_main_PairGenerator -i $OUTPUT/sfm_data.json -o $MATCHES/parirs.txt -m EXHAUSTIVE
 
 # 4. Matches Computation
 echo '\n 4. Executing Matches Computation \n'
-openMVG_main_ComputeMatches -i $OUTPUT/sfm_data.json -o $MATCHES/matches.putative.bin -p $MATCHES/parirs.bin -n AUTO
+openMVG_main_ComputeMatches -i $OUTPUT/sfm_data.json -o $MATCHES/matches.putative.bin -p $MATCHES/parirs.txt -n AUTO
 
 # 5. Geometric Filtering
 echo '\n 5. Executing Geometric Filtering \n'
-openMVG_main_GeometricFilter -i $OUTPUT/sfm_data.json -m $MATCHES/matches.putative.bin -o $MATCHES/matches.f.bin -p $MATCHES/parirs.bin
+openMVG_main_GeometricFilter -i $OUTPUT/sfm_data.json -m $MATCHES/matches.putative.bin -o $MATCHES/matches.f.txt -p $MATCHES/parirs.txt
 
 # 6. Compute Structure from Motion
 echo '\n 6. Executing Strucuture from Motion \n'
-openMVG_main_SfM -i $OUTPUT/sfm_data.json -m $MATCHES -o $RECONSTRUCTION -s INCREMENTAL -M $MATCHES/matches.f.bin
+openMVG_main_SfM -i $OUTPUT/sfm_data.json -m $MATCHES -o $RECONSTRUCTION -s INCREMENTAL -M $MATCHES/matches.f.txt
 
 # 7. New SfM data conversion to JSON
 echo '\n 7. Executing SfM data conversion to JSON \n'
