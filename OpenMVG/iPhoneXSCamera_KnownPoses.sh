@@ -1,66 +1,52 @@
 # Initialise openMVG Docker with the corresponding dataset
 # sudo docker run -it --rm --volume /media/agv/JesusGTI/Calibration/:/dataset  openmvg
 
-# Script for Spherical Images (360 camera)
+# Script for iPhone XS Max Images (iPhone XS Max camera)
 
 # Paths
-# You can choose between 360_Flat or 360_school
 DATASET='dataset/iPhone_Recordings/C_chess/frames'
 OUTPUT=$DATASET'/output'
-mkdir $OUTPUT
 MATCHES=$OUTPUT'/matches_for_known'
-mkdir $MATCHES
-SVG_MATCHING=$OUTPUT'/svg_corners'
-mkdir $SVG_MATCHING
-TRACKS=$OUTPUT'/tracks'
-mkdir $TRACKS
 RECONSTRUCTION=$OUTPUT'/Reconstruction_for_known'
-mkdir $RECONSTRUCTION
-MVS=$OUTPUT'/mvs'
+mkdir -p $RECONSTRUCTION
+SVG_MATCHING=$OUTPUT'/svg_corners'
+mkdir -p $SVG_MATCHING
+TRACKS=$OUTPUT'/tracks'
+mkdir -p $TRACKS
+# MVS=$OUTPUT'/mvs'
 # mkdir $MVS
-UNDISTOR=$OUTPUT/Undistorted
+# UNDISTOR=$OUTPUT/Undistorted
 # mkdir $UNDISTOR
 
-# Initial Focal Length (in pixels)
-INIT_F=4608
 
-# # openMVG Execution
-# #1. Export Matches
-# echo '\n 1. Exporting Matches, creation of SVG files'
-# openMVG_main_exportMatches -i $OUTPUT/sfm_data_with_info.json -d $MATCHES -m $MATCHES/matches.f.txt -o $SVG_MATCHING
+# # OpenMVG Execution
+# # Test to see if matches and tracks are correct before executing the reconstruction
+# # View Matches
+# echo 'Executing Export (to SVG format) Matches'
+# openMVG_main_exportMatches -i $OUTPUT/sfm_data.json -d $MATCHES -m $MATCHES/matches.putative.txt -o $SVG_MATCHING
+# #View Tracks
+# echo 'Executing Export (to SVG format) Tracks'
+# openMVG_main_exportMatches -i $OUTPUT/sfm_data.json -d $MATCHES -m $MATCHES/matches.putative.txt -o $TRACKS
 
-# #2. Export Tracks
-# echo '\n 2. Exporting Tracks'
-# openMVG_main_exportTracks -i $OUTPUT/sfm_data_with_info.json -d $MATCHES -m $MATCHES/matches.f.txt -o $TRACKS
+# Final Results
+# 1. Compute Structure from Motion
+echo '1. Executing Strucuture from Motion'
+openMVG_main_ComputeStructureFromKnownPoses -i $OUTPUT/sfm_data.json -m $MATCHES -o $RECONSTRUCTION/sfm_data_structure.bin -f $MATCHES/matches.putative.txt
 
-# 3. Compute Structure from Motion
-echo '\n 3. Executing Strucuture from Motion \n'
-openMVG_main_ComputeStructureFromKnownPoses -i $OUTPUT/sfm_data_with_info.json -m $MATCHES -o $RECONSTRUCTION/sfm_data_structure.bin -p $MATCHES/pairs.txt -f $MATCHES/matches.f.txt
-
-# 4. New SfM data conversion to JSON
-echo '\n 4. Executing SfM data conversion to JSON \n'
+# 2. New SfM data conversion to JSON
+echo '1. Executing SfM data conversion to JSON'
 openMVG_main_ConvertSfM_DataFormat -i $RECONSTRUCTION/sfm_data_structure.bin -o $RECONSTRUCTION/sfm_data_structure.json
 
 # Extra - The MVS files are the same but instead of points, triangles
 
-# 8. MVS conversion
+# 3. MVS conversion
 #echo '\n 8. Executing MVS conversion \n'
 #openMVG_main_openMVG2openMVS -i $RECONSTRUCTION/sfm_data.bin -o $MVS/scene.mvs -d $UNDISTOR
 
 #
 
 # Options per command
-# 1. Export Matches
-	# [-i|--input_file file] path to a SfM_Data scene
-	# [-d|--matchdir path]
-	# [-m|--sMatchFile filename]
-	# [-o|--outdir path]
-# 2. Export Tracks
-	# [-i|--input_file file] path to a SfM_Data scene
-	# [-d|--matchdir path]
-	# [-m|--sMatchFile filename]
-	# [-o|--outdir path]
-# 3. Compute Structure From Known Poses
+# 1. Compute Structure From Known Poses
 	# [-i|--input_file] path to a SfM_Data scene
 	# [-m|--match_dir] path to the features and descriptors that corresponds to the provided SfM_Data scene
 	# [-o|--output_file] file where the output data will be stored (i.e. path/sfm_data_structure.bin)
