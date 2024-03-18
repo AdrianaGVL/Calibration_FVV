@@ -4,17 +4,17 @@ sudo docker run -it --rm --volume /media/agv/JesusGTI/Calibration/:/dataset  ope
 # Script for iPhone XS Max
 
 # Paths
-DATASET='iPhone_Recordings/C_chess/frames'
+DATASET='iPhone_Recordings/D_Chess'
 OUTPUT=$DATASET'/output'
-mkdir $OUTPUT
+mkdir -p $OUTPUT
 MATCHES=$OUTPUT'/matches'
-mkdir $MATCHES
+mkdir -p $MATCHES
 RECONSTRUCTION=$OUTPUT'/Reconstruction'
-mkdir $RECONSTRUCTION
-MVS=$OUTPUT'/mvs'
-mkdir $MVS
-UNDISTOR=$OUTPUT/Undistorted
-mkdir $UNDISTOR
+mkdir -p $RECONSTRUCTION
+# MVS=$OUTPUT'/mvs'
+# mkdir $MVS
+# UNDISTOR=$OUTPUT/Undistorted
+# mkdir $UNDISTOR
 
 # Initial Focal Length (in pixels)
 INIT_F=4608
@@ -22,7 +22,7 @@ INIT_F=4608
 # openMVG Execution
 # 1. Images Listing
 echo '\n 1. Executing Images Listing \n'
-openMVG_main_SfMInit_ImageListing -i $DATASET -o $OUTPUT -f $INIT_F -g 1
+openMVG_main_SfMInit_ImageListing -i $DATASET/frames -o $OUTPUT -f $INIT_F -g 1
 
 #2. Features Computation
 echo '\n 2. Executing Features Computation \n'

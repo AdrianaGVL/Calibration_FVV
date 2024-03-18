@@ -4,15 +4,15 @@
 # Script for iPhone XS Max Images (iPhone XS Max camera)
 
 # Paths
-DATASET='dataset/iPhone_Recordings/C_chess/frames'
+DATASET='dataset/iPhone_Recordings/C_chess'
 OUTPUT=$DATASET'/output'
 MATCHES=$OUTPUT'/matches_for_known'
 RECONSTRUCTION=$OUTPUT'/Reconstruction_for_known'
 mkdir -p $RECONSTRUCTION
-SVG_MATCHING=$OUTPUT'/svg_corners'
-mkdir -p $SVG_MATCHING
-TRACKS=$OUTPUT'/tracks'
-mkdir -p $TRACKS
+# SVG_MATCHING=$OUTPUT'/svg_corners'
+# mkdir -p $SVG_MATCHING
+# TRACKS=$OUTPUT'/tracks'
+# mkdir -p $TRACKS
 # MVS=$OUTPUT'/mvs'
 # mkdir $MVS
 # UNDISTOR=$OUTPUT/Undistorted
@@ -31,7 +31,7 @@ mkdir -p $TRACKS
 # Final Results
 # 1. Compute Structure from Motion
 echo '1. Executing Strucuture from Motion'
-openMVG_main_ComputeStructureFromKnownPoses -i $OUTPUT/sfm_data.json -m $MATCHES -o $RECONSTRUCTION/sfm_data_structure.bin -f $MATCHES/matches.putative.txt
+openMVG_main_ComputeStructureFromKnownPoses -i $OUTPUT/sfm_data.json -m $MATCHES -o $RECONSTRUCTION/sfm_data_structure.bin -d -f $MATCHES/matches.putative.txt
 
 # 2. New SfM data conversion to JSON
 echo '1. Executing SfM data conversion to JSON'

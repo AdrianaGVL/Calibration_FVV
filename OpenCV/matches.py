@@ -6,7 +6,7 @@ import json
 
 # Paths
 main_path = '/media/agv/JesusGTI/Calibration'
-scene_path = f'{main_path}/iPhone_Recordings/C_chess/frames'    
+scene_path = f'{main_path}/iPhone_Recordings/C_chess'    
 savepath = f'{scene_path}/output/matches_for_known'
 sfm_data_file = f'{scene_path}/output/sfm_data.json'
 
@@ -37,7 +37,7 @@ for j in range(len(feats_files)):
         pos = 0
         file_file = first_file.split('/')[-1]
         file_file = file_file.split('.')[0]
-        file_file = f'{file_file}.png'
+        file_file = f'{file_file}.jpeg'
 
         # Index to obtain the ID.
         try:
@@ -68,7 +68,7 @@ for j in range(len(feats_files)):
             pos = 0
             file_file = feat.split('/')[-1]
             file_file = file_file.split('.')[0]
-            file_file = f'{file_file}.png'
+            file_file = f'{file_file}.jpeg'
 
             # Index to obtain the ID.
             try:
@@ -93,11 +93,11 @@ for j in range(len(feats_files)):
         # Sort corners by columns and files
         # data2.sort(key = operator.itemgetter(0, 1))
 
-        # with open(f"{savepath}/pairs.txt", "a+") as p:
-        #     p.write(f'{file1_id} {file2_id}\n')
-        # p.close
+        with open(f"{savepath}/pairs.txt", "a") as p:
+            p.write(f'{file1_id} {file2_id}\n')
+        p.close
 
-        with open(f"{savepath}/matches.putative.txt", "a+") as m:
+        with open(f"{savepath}/matches.putative.txt", "a") as m:
             m.write(f'{file1_id} {file2_id}\n')
             m.write(f'{len(data1)}\n')
             for i in range(len(data1)):

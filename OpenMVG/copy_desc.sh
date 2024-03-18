@@ -1,7 +1,7 @@
 # Script for copy 6144 bytes OpenMVG .desc files
 
 # Paths
-DATASET='/media/agv/JesusGTI/Calibration/iPhone_Recordings/C_chess/frames'
+DATASET='/media/agv/JesusGTI/Calibration/iPhone_Recordings/D_Chess'
 OUTPUT=$DATASET'/output'
 # mkdir $OUTPUT
 MATCHES=$OUTPUT'/matches'
@@ -12,6 +12,6 @@ for file in "$MATCHES"/*".desc"; do
   if [ -f "$file" ]; then
   	base_name=$(basename ${file})
 	echo $base_name
-    { head -c6144 > "$MYMATCHES/$base_name"; } < $file
+    { head -c6400 > "$MYMATCHES/$base_name"; } < $file
   fi
 done
