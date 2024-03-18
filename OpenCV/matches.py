@@ -5,10 +5,11 @@ from natsort import natsorted
 import json
 
 # Paths
-main_path = '/media/agv/JesusGTI/Calibration'
-scene_path = f'{main_path}/iPhone_Recordings/C_chess'    
-savepath = f'{scene_path}/output/matches_for_known'
-sfm_data_file = f'{scene_path}/output/sfm_data.json'
+main_path = '/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
+scene_path = f'{main_path}/frames'
+results_path = f'{main_path}/output'  
+savepath = f'{results_path}/matches_for_known'
+sfm_data_file = f'{results_path}/sfm_data.json'
 
 # All files
 feats_files = natsorted(glob.glob(f'{savepath}/*.feat'))

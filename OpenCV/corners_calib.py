@@ -8,9 +8,9 @@ import numpy as np
 import json
 
 # Paths
-main_path = '/media/agv/JesusGTI/Calibration'
-scene_path = f'{main_path}/iPhone_Recordings/D_Chess'
-results_path = f'{scene_path}/output'
+main_path = '/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
+scene_path = f'{main_path}/frames'
+results_path = f'{main_path}/output'
 sfm_data_file = f'{results_path}/sfm_data_no_info.json'
 drawn_corners_path = f'{results_path}/frames_with_corners_opencv'
 features_path = f'{results_path}/matches_for_known'
@@ -25,7 +25,7 @@ nCorners_x = 10
 nCorners_y = 5
 
 # List the images (frames in this case)
-chess_images = natsorted(glob.glob(f'{scene_path}/frames/*.jpeg'))
+chess_images = natsorted(glob.glob(f'{scene_path}/IMG_4146.jpeg'))
 objpoints = []
 imgpoints = []
 
@@ -114,11 +114,11 @@ for i in range(len(imgpoints)):
     R_y = np.eye(3)
     R_z = np.eye(3)
     cv2.Rodrigues(np.array([[1, 0, 0]]) * rvec[0], R_x)
-    matrices.append(R_x)
+    matrices.append(R_x[0].tolist())
     cv2.Rodrigues(np.array([[0, 1, 0]]) * rvec[1], R_y)
-    matrices.append(R_y)
+    matrices.append(R_y.tolist())
     cv2.Rodrigues(np.array([[0, 0, 1]]) * rvec[2], R_z)
-    matrices.append(R_y)
+    matrices.append(R_y.tolist())
     # OpenMVG work with the camera center and not with translation directly
     c_x = -np.dot(R_x, tvec)[0]
     center.append(c_x)

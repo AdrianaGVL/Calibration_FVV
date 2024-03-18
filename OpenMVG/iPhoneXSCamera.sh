@@ -4,8 +4,9 @@ sudo docker run -it --rm --volume /media/agv/JesusGTI/Calibration/:/dataset  ope
 # Script for iPhone XS Max
 
 # Paths
-DATASET='iPhone_Recordings/D_Chess'
-OUTPUT=$DATASET'/output'
+MAIN='/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
+DATASET=$MAIN/frames
+OUTPUT=$MAIN'/output'
 mkdir -p $OUTPUT
 MATCHES=$OUTPUT'/matches'
 mkdir -p $MATCHES
@@ -22,7 +23,7 @@ INIT_F=4608
 # openMVG Execution
 # 1. Images Listing
 echo '\n 1. Executing Images Listing \n'
-openMVG_main_SfMInit_ImageListing -i $DATASET/frames -o $OUTPUT -f $INIT_F -g 1
+openMVG_main_SfMInit_ImageListing -i $DATASET -o $OUTPUT -f $INIT_F -g 1
 
 #2. Features Computation
 echo '\n 2. Executing Features Computation \n'
