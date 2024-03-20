@@ -2,7 +2,8 @@
 
 # Paths
 MAIN='/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
-OUTPUT=$MAIN'/output'
+SCENE=$MAIN'/Video_Chess_D'
+OUTPUT=$SCENE'/output'
 MATCHES=$OUTPUT'/matches_for_known'
 RECONSTRUCTION=$OUTPUT'/Reconstruction_for_known'
 mkdir -p $RECONSTRUCTION

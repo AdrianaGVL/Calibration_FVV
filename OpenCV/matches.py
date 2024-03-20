@@ -6,8 +6,9 @@ import json
 
 # Paths
 main_path = '/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
-scene_path = f'{main_path}/frames'
-results_path = f'{main_path}/output'  
+scene_path = f'{main_path}/Video_Chess_D'
+frames_path = f'{scene_path}/frames'
+results_path = f'{scene_path}/output'
 savepath = f'{results_path}/matches_for_known'
 sfm_data_file = f'{results_path}/sfm_data.json'
 
@@ -38,7 +39,7 @@ for j in range(len(feats_files)):
         pos = 0
         file_file = first_file.split('/')[-1]
         file_file = file_file.split('.')[0]
-        file_file = f'{file_file}.jpeg'
+        file_file = f'{file_file}.png'
 
         # Index to obtain the ID.
         try:
@@ -69,7 +70,7 @@ for j in range(len(feats_files)):
             pos = 0
             file_file = feat.split('/')[-1]
             file_file = file_file.split('.')[0]
-            file_file = f'{file_file}.jpeg'
+            file_file = f'{file_file}.png'
 
             # Index to obtain the ID.
             try:

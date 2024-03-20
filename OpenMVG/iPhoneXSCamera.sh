@@ -1,12 +1,10 @@
-# Initialise openMVG Docker with the corresponding dataset
-sudo docker run -it --rm --volume /media/agv/JesusGTI/Calibration/:/dataset  openmvg
-
 # Script for iPhone XS Max
 
 # Paths
 MAIN='/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
-DATASET=$MAIN/frames
-OUTPUT=$MAIN'/output'
+SCENE=$MAIN'/Video_Chess_D'
+DATASET=$SCENE/frames
+OUTPUT=$SCENE'/output'
 mkdir -p $OUTPUT
 MATCHES=$OUTPUT'/matches'
 mkdir -p $MATCHES
@@ -25,29 +23,33 @@ INIT_F=4608
 echo '\n 1. Executing Images Listing \n'
 openMVG_main_SfMInit_ImageListing -i $DATASET -o $OUTPUT -f $INIT_F -g 1
 
+mv $OUTPUT/sfm_data.json $OUTPUT/sfm_data_no_poses.json
+
 #2. Features Computation
 echo '\n 2. Executing Features Computation \n'
-openMVG_main_ComputeFeatures -i $OUTPUT/sfm_data.json -o $MATCHES -m SIFT -f 1 -p HIGH -n 8
+openMVG_main_ComputeFeatures -i $OUTPUT/sfm_data_no_poses.json -o $MATCHES -m SIFT -f 1 -p HIGH -n 8
 
 # 3. Pair Generator
 echo ' \n 3. Executing Pair Generator \n'
-openMVG_main_PairGenerator -i $OUTPUT/sfm_data.json -o $MATCHES/parirs.txt -m EXHAUSTIVE
+openMVG_main_PairGenerator -i $OUTPUT/sfm_data_no_poses.json -o $MATCHES/pairs.bin -m EXHAUSTIVE
 
 # 4. Matches Computation
 echo '\n 4. Executing Matches Computation \n'
-openMVG_main_ComputeMatches -i $OUTPUT/sfm_data.json -o $MATCHES/matches.putative.bin -p $MATCHES/parirs.txt -n AUTO
+openMVG_main_ComputeMatches -i $OUTPUT/sfm_data_no_poses.json -o $MATCHES/matches.putative.bin -p $MATCHES/pairs.bin -n AUTO
 
 # 5. Geometric Filtering
 echo '\n 5. Executing Geometric Filtering \n'
-openMVG_main_GeometricFilter -i $OUTPUT/sfm_data.json -m $MATCHES/matches.putative.bin -o $MATCHES/matches.f.txt -p $MATCHES/parirs.txt
+openMVG_main_GeometricFilter -i $OUTPUT/sfm_data_no_poses.json -m $MATCHES/matches.putative.bin -o $MATCHES/matches.f.bin -p $MATCHES/pairs.bin
 
 # 6. Compute Structure from Motion
 echo '\n 6. Executing Strucuture from Motion \n'
-openMVG_main_SfM -i $OUTPUT/sfm_data.json -m $MATCHES -o $RECONSTRUCTION -s INCREMENTAL -M $MATCHES/matches.f.txt
+openMVG_main_SfM -i $OUTPUT/sfm_data_no_poses.json -m $MATCHES -o $RECONSTRUCTION -s INCREMENTAL -M $MATCHES/matches.f.bin
 
 # 7. New SfM data conversion to JSON
 echo '\n 7. Executing SfM data conversion to JSON \n'
 openMVG_main_ConvertSfM_DataFormat -i $RECONSTRUCTION/sfm_data.bin -o $RECONSTRUCTION/sfm_data.json
+
+mv $RECONSTRUCTION/sfm_data.json $OUTPUT/sfm_data.json
 
 # Extra - The MVS files are the same but instead of points, triangles
 

@@ -8,8 +8,9 @@ import numpy as np
 
 # Paths
 main_path = '/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
-scene_path = f'{main_path}/frames'
-results_path = f'{main_path}/output'
+scene_path = f'{main_path}/Video_Chess_D'
+frames_path = f'{scene_path}/frames'
+results_path = f'{scene_path}/output'
 drawn_corners_path = f'{results_path}/frames_with_corners_opencv_test'
 
 # Save Images with drawn corners?
@@ -17,8 +18,8 @@ img_with_corners = False
 img_corners_show = False    # Print every image with its drawn corners for 3s (can be change to wait key)
 
 # Number or corners along the x axes and y axes
-nCorners_x = 5
-nCorners_y = 10
+nCorners_x = 10
+nCorners_y = 5
 
 # Coordinates for test?
 testing = False
@@ -30,7 +31,7 @@ else:
 os.makedirs(features_path, exist_ok=True)
 
 # List the images (frames in this case)
-chess_images = natsorted(glob.glob(f'{scene_path}/*.jpeg'))
+chess_images = natsorted(glob.glob(f'{frames_path}/*.png'))
 
 # Loop to iterate along all the images
 for i in range(len(chess_images)):
@@ -50,7 +51,7 @@ for i in range(len(chess_images)):
         if img_with_corners:
             os.makedirs(drawn_corners_path, exist_ok=True)
             # Draw the corners
-            cv2.drawChessboardCorners(chess_board_image, (1, 1), corners[1], fconers) #(nCorners_x, nCorners_y)
+            cv2.drawChessboardCorners(chess_board_image, (1, 1), corners[1], fconers) #(nCorners_x, nCorners_y), corners,
             cv2.imwrite(f'{drawn_corners_path}/IMG_{str(i)}.png', chess_board_image)
             if img_corners_show:
                 cv2.imshow(f'{file} with corners',chess_board_image)
@@ -76,3 +77,6 @@ for i in range(len(chess_images)):
         # with open(path,'wb') as d:
         #     data(f,sep='')
         # d.close
+    else:
+        os.makedirs(f'{frames_path}/not_corners', exist_ok=True)
+        os.rename(chess_images[i], f'{frames_path}/not_corners/{file}')
