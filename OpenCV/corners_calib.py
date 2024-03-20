@@ -114,7 +114,7 @@ for i in range(len(imgpoints)):
     R_y = np.eye(3)
     R_z = np.eye(3)
     cv2.Rodrigues(np.array([[1, 0, 0]]) * rvec[0], R_x)
-    matrices.append(R_x[0].tolist())
+    matrices.append(R_x.tolist())
     cv2.Rodrigues(np.array([[0, 1, 0]]) * rvec[1], R_y)
     matrices.append(R_y.tolist())
     cv2.Rodrigues(np.array([[0, 0, 1]]) * rvec[2], R_z)

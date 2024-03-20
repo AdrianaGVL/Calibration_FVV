@@ -98,9 +98,12 @@ for j in range(len(feats_files)):
             p.write(f'{file1_id} {file2_id}\n')
         p.close
 
-        with open(f"{savepath}/matches.putative.txt", "a") as m:
-            m.write(f'{file1_id} {file2_id}\n')
-            m.write(f'{len(data1)}\n')
-            for i in range(len(data1)):
-                m.write(f'{data1[i][2]} {data2[i][2]}\n')
-        m.close
+        if len(data1) == len(data2):
+            with open(f"{savepath}/matches.f.txt", "a") as m:
+                m.write(f'{file1_id} {file2_id}\n')
+                m.write(f'{len(data1)}\n')
+                for i in range(len(data1)):
+                    m.write(f'{data1[i][2]} {data2[i][2]}\n')
+            m.close
+        else:
+            print(f'Error, frame {file1_id} do not contain the same amunt of corners ({len(data1)}) than {file2_id} ({len(data2)})')

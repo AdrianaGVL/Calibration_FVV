@@ -1,11 +1,8 @@
-# Initialise openMVG Docker with the corresponding dataset
-# sudo docker run -it --rm --volume /media/agv/JesusGTI/Calibration/:/dataset  openmvg
-
 # Script for iPhone XS Max Images (iPhone XS Max camera)
 
 # Paths
-DATASET='dataset/iPhone_Recordings/C_chess'
-OUTPUT=$DATASET'/output'
+MAIN='/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
+OUTPUT=$MAIN'/output'
 MATCHES=$OUTPUT'/matches_for_known'
 RECONSTRUCTION=$OUTPUT'/Reconstruction_for_known'
 mkdir -p $RECONSTRUCTION
@@ -31,11 +28,12 @@ mkdir -p $RECONSTRUCTION
 # Final Results
 # 1. Compute Structure from Motion
 echo '1. Executing Strucuture from Motion'
-openMVG_main_ComputeStructureFromKnownPoses -i $OUTPUT/sfm_data.json -m $MATCHES -o $RECONSTRUCTION/sfm_data_structure.bin -d -f $MATCHES/matches.putative.txt
+openMVG_main_ComputeStructureFromKnownPoses -i $OUTPUT/sfm_data.json -m $MATCHES -o $RECONSTRUCTION/cloud_and_poses.bin -d -f $MATCHES/matches.f.txt
+# openMVG_main_SfM -i $OUTPUT/sfm_data.json -m $MATCHES -o $RECONSTRUCTION -s INCREMENTALV2 -S EXISTING_POSE -M $MATCHES/matches.f.txt
 
 # 2. New SfM data conversion to JSON
 echo '1. Executing SfM data conversion to JSON'
-openMVG_main_ConvertSfM_DataFormat -i $RECONSTRUCTION/sfm_data_structure.bin -o $RECONSTRUCTION/sfm_data_structure.json
+openMVG_main_ConvertSfM_DataFormat -i $RECONSTRUCTION/cloud_and_poses.bin -o $RECONSTRUCTION/cloud_and_poses.json
 
 # Extra - The MVS files are the same but instead of points, triangles
 
