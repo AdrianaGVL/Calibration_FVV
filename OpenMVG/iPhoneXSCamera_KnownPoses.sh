@@ -1,20 +1,27 @@
+#######################
+#  Created on: March 18, 2024
+#  Author: Adriana GV
+#######################
+
 # Script for iPhone XS Max Images (iPhone XS Max camera)
 
 # Paths
 MAIN='/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
-SCENE=$MAIN'/Video_Chess_D'
-OUTPUT=$SCENE'/output'
+SCENE=$MAIN'/Video_Chess_C'
+OUTPUT=$SCENE'/output_chiquito'
 MATCHES=$OUTPUT'/matches_for_known'
 RECONSTRUCTION=$OUTPUT'/Reconstruction_for_known'
 mkdir -p $RECONSTRUCTION
-# SVG_MATCHING=$OUTPUT'/svg_corners'
+# MVS=$OUTPUT'/mvs'
+# mkdir -p $MVS
+# UNDISTOR=$OUTPUT/Undistorted
+# mkdir -p $UNDISTOR
+
+ # Error search paths
+ # SVG_MATCHING=$OUTPUT'/svg_corners'
 # mkdir -p $SVG_MATCHING
 # TRACKS=$OUTPUT'/tracks'
 # mkdir -p $TRACKS
-# MVS=$OUTPUT'/mvs'
-# mkdir $MVS
-# UNDISTOR=$OUTPUT/Undistorted
-# mkdir $UNDISTOR
 
 
 # # OpenMVG Execution
@@ -33,16 +40,20 @@ openMVG_main_ComputeStructureFromKnownPoses -i $OUTPUT/sfm_data.json -m $MATCHES
 # openMVG_main_SfM -i $OUTPUT/sfm_data.json -m $MATCHES -o $RECONSTRUCTION -s INCREMENTALV2 -S EXISTING_POSE -M $MATCHES/matches.f.txt
 
 # 2. New SfM data conversion to JSON
-echo '1. Executing SfM data conversion to JSON'
+echo '2. Executing SfM data conversion to JSON'
 openMVG_main_ConvertSfM_DataFormat -i $RECONSTRUCTION/cloud_and_poses.bin -o $RECONSTRUCTION/cloud_and_poses.json
 
-# Extra - The MVS files are the same but instead of points, triangles
+# 3. Colorise the reconstruction
+echo '3. Executing Colouring Reconstruction'
+openMVG_main_ComputeSfM_DataColor -i $RECONSTRUCTION/cloud_and_poses.json -o $RECONSTRUCTION/cloud_and_poses_colour.ply
 
-# 3. MVS conversion
-#echo '\n 8. Executing MVS conversion \n'
-#openMVG_main_openMVG2openMVS -i $RECONSTRUCTION/sfm_data.bin -o $MVS/scene.mvs -d $UNDISTOR
+## 4. MeshLab conversion
+echo '4. Executing MeshLab conversion'
+openMVG_main_openMVG2MESHLAB -i $RECONSTRUCTION/cloud_and_poses.json -p $RECONSTRUCTION/cloud_and_poses_colour.ply -o $RECONSTRUCTION
 
-#
+## Extra - 1. MVS conversion (files are the same but instead of points, triangles)
+#echo ' Extra - 1. Executing MVS conversion'
+#openMVG_main_openMVG2openMVS -i $RECONSTRUCTION/cloud_and_poses.bin -o $MVS/cloud_and_poses.mvs -d $UNDISTOR
 
 # Options per command
 # 1. Compute Structure From Known Poses

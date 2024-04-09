@@ -1,3 +1,8 @@
+#######################
+#  Created on: March 18, 2024
+#  Author: Adriana GV
+#######################
+
 # Initialise openMVG Docker with the corresponding dataset
 sudo docker run -it --rm --volume /media/agv/JesusGTI/Calibration/:/dataset  openmvg
 

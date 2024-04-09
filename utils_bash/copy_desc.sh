@@ -1,13 +1,15 @@
-# Script for copy 6144 bytes OpenMVG .desc files
+#######################
+#  Script for copy 6144 bytes OpenMVG .desc files
+#  Created on: March 18, 2024
+#  Author: Adriana GV
+#######################
 
 # Paths
 MAIN='/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
-SCENE=$MAIN'/Video_Chess_D'
-OUTPUT=$SCENE'/output'
+SCENE=$MAIN'/Video_Chess_C'
+OUTPUT=$SCENE'/output_chiquito'
 MATCHES=$OUTPUT'/matches'
 MYMATCHES=$OUTPUT/matches_for_known
-TESTING_PATH=$OUTPUT/Testing_matches
-mkdir -p $TESTING_PATH
 
 # Bytes needed
 # NUM_CORNERS=1
@@ -19,6 +21,6 @@ for file in "$MATCHES"/*".desc"; do
   if [ -f "$file" ]; then
   	base_name=$(basename ${file})
 	echo $base_name
-    { head -c6400 > "$MYMATCHES/$base_name"; } < $file
+    { head -c6144 > "$MYMATCHES/$base_name"; } < $file
   fi
 done

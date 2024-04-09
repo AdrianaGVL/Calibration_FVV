@@ -1,3 +1,8 @@
+#######################
+#  Created on: March 18, 2024
+#  Author: Adriana GV
+#######################
+
 #Libraries
 import cv2
 import glob
@@ -8,26 +13,21 @@ import numpy as np
 
 # Paths
 main_path = '/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
-scene_path = f'{main_path}/Video_Chess_D'
-frames_path = f'{scene_path}/frames'
-results_path = f'{scene_path}/output'
-drawn_corners_path = f'{results_path}/frames_with_corners_opencv_test'
+scene_path = f'{main_path}/Video_Chess_C'
+frames_path = f'{scene_path}/frames_I'
+results_path = f'{scene_path}/output_chiquito'
+drawn_corners_path = f'{results_path}/frames_with_corners'
 
 # Save Images with drawn corners?
 img_with_corners = False
 img_corners_show = False    # Print every image with its drawn corners for 3s (can be change to wait key)
 
 # Number or corners along the x axes and y axes
-nCorners_x = 10
-nCorners_y = 5
+nCorners_x = 8
+nCorners_y = 6
 
 # Coordinates for test?
-testing = False
-num_samples = 3
-if testing:
-    features_path = f'{results_path}/Testing_matches'
-else:
-    features_path = f'{results_path}/matches_for_known'
+features_path = f'{results_path}/matches_for_known'
 os.makedirs(features_path, exist_ok=True)
 
 # List the images (frames in this case)
@@ -59,24 +59,13 @@ for i in range(len(chess_images)):
 
         # .feat files are created
         with open(f'{features_path}/{file_file}.feat', 'w') as f:
-            if testing:
-                i = 0
-                while i < num_samples:
-                    f.write(f'{corners[i][0][0]} {corners[i][0][1]} 1 0\n')
-                    i += 1
-            else:
-                for coord in corners:
+            for coord in corners:
                     f.write(f'{coord[0][0]} {coord[0][1]} 1 0\n')
         f.close
 
-        # .desc files are created
-        # data = np.empty(dtype=np.uint8, shape = (desc.size + 8))
-        # data[0:8].view(dtype=np.uint64)[0] = desc.shape[0]
-        # data[8:] = desc.flatten()
-
-        # with open(path,'wb') as d:
-        #     data(f,sep='')
-        # d.close
     else:
-        os.makedirs(f'{frames_path}/not_corners', exist_ok=True)
-        os.rename(chess_images[i], f'{frames_path}/not_corners/{file}')
+        with open(f'{features_path}/{file_file}.feat', 'w') as f:
+            f.write(f'')
+        f.close
+        # os.makedirs(f'{frames_path}/not_corners', exist_ok=True)
+        # os.rename(chess_images[i], f'{frames_path}/not_corners/{file}')

@@ -1,10 +1,16 @@
+#######################
+#  Created on: March 18, 2024
+#  Author: Adriana GV
+#######################
+
+
 # Script for iPhone XS Max
 
 # Paths
 MAIN='/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
-SCENE=$MAIN'/Video_Chess_D'
-DATASET=$SCENE/frames
-OUTPUT=$SCENE'/output'
+SCENE=$MAIN'/Video_Chess_C'
+DATASET=$SCENE/frames_I
+OUTPUT=$SCENE'/output_chiquito'
 mkdir -p $OUTPUT
 MATCHES=$OUTPUT'/matches'
 mkdir -p $MATCHES

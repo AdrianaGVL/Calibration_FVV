@@ -1,3 +1,8 @@
+#######################
+#  Created on: March 18, 2024
+#  Author: Adriana GV
+#######################
+
 #Libraries
 import operator
 import glob
@@ -6,9 +11,9 @@ import json
 
 # Paths
 main_path = '/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
-scene_path = f'{main_path}/Video_Chess_D'
-frames_path = f'{scene_path}/frames'
-results_path = f'{scene_path}/output'
+scene_path = f'{main_path}/Video_Chess_C'
+frames_path = f'{scene_path}/frames_I'
+results_path = f'{scene_path}/output_chiquito'
 savepath = f'{results_path}/matches_for_known'
 sfm_data_file = f'{results_path}/sfm_data.json'
 
@@ -107,4 +112,4 @@ for j in range(len(feats_files)):
                     m.write(f'{data1[i][2]} {data2[i][2]}\n')
             m.close
         else:
-            print(f'Error, frame {file1_id} do not contain the same amunt of corners ({len(data1)}) than {file2_id} ({len(data2)})')
+            print(f'frame {file1_id} do not contain the same amunt of corners ({len(data1)}) than {file2_id} ({len(data2)})')
