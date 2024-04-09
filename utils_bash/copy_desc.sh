@@ -20,7 +20,7 @@ MYMATCHES=$OUTPUT/matches_for_known
 for file in "$MATCHES"/*".desc"; do
   if [ -f "$file" ]; then
   	base_name=$(basename ${file})
-	echo $base_name
+	  echo $base_name
     { head -c6144 > "$MYMATCHES/$base_name"; } < $file
   fi
 done

@@ -67,5 +67,3 @@ for i in range(len(chess_images)):
         with open(f'{features_path}/{file_file}.feat', 'w') as f:
             f.write(f'')
         f.close
-        # os.makedirs(f'{frames_path}/not_corners', exist_ok=True)
-        # os.rename(chess_images[i], f'{frames_path}/not_corners/{file}')

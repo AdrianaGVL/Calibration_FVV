@@ -9,19 +9,22 @@ import statistics
 
 # Paths
 main_path = '/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
-scene_path = f'{main_path}/Video_Chess_D'
-results_path = f'{scene_path}/output'
+scene_path = f'{main_path}/Video_Chess_C'
+results_path = f'{scene_path}/output_chiquito'
 sfm_data_file = f'{results_path}/Reconstruction_for_known/cloud_and_poses.json'
 chess_measures_path = f'{results_path}/measures_chess.json'
 
 # Number or corners along the x axes and y axes
-nCorners_x = 10
-nCorners_y = 5
+nCorners_x = 8
+nCorners_y = 6
 last = [nCorners_x * i for i in range(nCorners_y+1)]
 
 
 # Distance in real life (m)
-dist = 0.3010
+if scene_path == f'{main_path}/Video_Chess_C':
+    dist = 0.028
+elif scene_path == f'{main_path}/Video_Chess_D':
+    dist = 0.301
 
 # JSON Structure
 measures = {
@@ -96,6 +99,6 @@ measures["Standard deviation"] = statistics.stdev(scales)
 measures["Max. scaling value"] = max(scales)
 measures["Min. scaling value"] = min(scales)
 
-with open(f'{scene_path}/output/measures_chess.json', 'w') as pqs:
+with open(f'{results_path}/measures_chess.json', 'w') as pqs:
     json.dump(measures, pqs, indent=4)
 pqs.close
