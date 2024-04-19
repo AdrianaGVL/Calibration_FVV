@@ -7,8 +7,8 @@
 
 # Paths
 MAIN='/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
-SCENE=$MAIN'/Video_Chess_C'
-OUTPUT=$SCENE'/output_chiquito'
+SCENE=$MAIN'/Video_Chess_D'
+OUTPUT=$SCENE'/output'
 MATCHES=$OUTPUT'/matches_for_known'
 RECONSTRUCTION=$OUTPUT'/Reconstruction_for_known'
 mkdir -p $RECONSTRUCTION
@@ -17,21 +17,24 @@ mkdir -p $RECONSTRUCTION
 # UNDISTOR=$OUTPUT/Undistorted
 # mkdir -p $UNDISTOR
 
- # Error search paths
- # SVG_MATCHING=$OUTPUT'/svg_corners'
+# Error search paths
+# SVG_MATCHING=$OUTPUT'/svg_corners'
 # mkdir -p $SVG_MATCHING
-# TRACKS=$OUTPUT'/tracks'
-# mkdir -p $TRACKS
+TRACKS=$OUTPUT'/tracks'
+mkdir -p $TRACKS
 
 
 # # OpenMVG Execution
 # # Test to see if matches and tracks are correct before executing the reconstruction
 # # View Matches
 # echo 'Executing Export (to SVG format) Matches'
-# openMVG_main_exportMatches -i $OUTPUT/sfm_data.json -d $MATCHES -m $MATCHES/matches.putative.txt -o $SVG_MATCHING
+# openMVG_main_exportMatches -i $OUTPUT/sfm_data.json -d $MATCHES -m $MATCHES/matches.f.txt -o $SVG_MATCHING
+#Matches to Tracks
+# echo 'Matches to Tracks'
+# openMVG_main_MatchesToTracks -i $RECONSTRUCTION/cloud_and_poses.json  -d $MATCHES -m $MATCHES/matches.f.txt -o $TRACKS
 # #View Tracks
 # echo 'Executing Export (to SVG format) Tracks'
-# openMVG_main_exportMatches -i $OUTPUT/sfm_data.json -d $MATCHES -m $MATCHES/matches.putative.txt -o $TRACKS
+# openMVG_main_exportTracks -i $OUTPUT/sfm_data.json -d $MATCHES -m $MATCHES/matches.f.txt -o $TRACKS
 
 # Final Results
 # 1. Compute Structure from Motion
