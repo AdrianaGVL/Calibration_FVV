@@ -15,12 +15,13 @@ import numpy as np
 
 # Paths
 scene = 'Video_Chess_D'
-version = '' # Nothing ('') or '_mm'
+camera = 'Azure'
+version = '_mm' # Nothing ('') or '_mm'
 main_path = '/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
 scene_path = f'{main_path}/{scene}'
 results_path = f'{scene_path}/output'
 sfm_data_file = f'{results_path}/Reconstruction_for_known/cloud_and_poses{version}.json'
-chess_measures_file = f'{results_path}/measures_chess{version}.json'
+chess_measures_file = f'{results_path}/measures_chess{version}_prueba.json'
 frame_path = f'{scene_path}/frames/frame_29.png'
 
 # Number or corners along the x axes and y axes
@@ -40,6 +41,18 @@ measures = {
     "Scene": scene,
     "Measures":{
         "Scaling Factor":{
+            "Mean": '',
+            "Standard deviation": '',
+            "Max. value": '',
+            "Min. value": ''
+        },
+        "Error distance between reconstructed values and real ones in the X-axis":{
+            "Mean": '',
+            "Standard deviation": '',
+            "Max. value": '',
+            "Min. value": ''
+        },
+        "Error distance between reconstructed values and real ones in the Y-axis":{
             "Mean": '',
             "Standard deviation": '',
             "Max. value": '',
@@ -89,6 +102,9 @@ for coords in sfm_data["structure"]:
     points_3D.append(point_3D)
 
 scales = []
+errors_distance_x = []
+errors_distance_y = []
+errors_distance_total = []
 angles_x = []
 angles_y = []
 pos_aux = 0
@@ -99,12 +115,17 @@ for i in range(len(points_3D)):
     if i != ((nCorners_x*pos_aux)-1):
         dist_x = points_3D[i][0] - points_3D[i+1][0]
         dist_y = points_3D[i][1] - points_3D[i+1][1]
+
         scale_x = abs(dist/dist_x) # Scale in the corresponding (dist) units
-        angle_x = math.degrees(math.atan2(dist_x, dist_y)) # Will return a negative value if clockwise
+        angle_x = math.degrees(math.atan(dist_y/dist_x)) # Will return a negative value if clockwise
         distance["X axis data"]["Reference point"] = i
         distance["X axis data"]["Adjacent point"] = i+1
         distance["X axis data"]["distance"] = abs(dist_x)
         distance["X axis data"]["Scale"] = scale_x
+        if version == '_mm':
+            error_distance = scale_x - 1.0000000
+            errors_distance_x.append(error_distance)
+            errors_distance_total.append(error_distance)
         distance["X axis data"]["Angle"] = angle_x
         scales.append(scale_x)
         angles_x.append(angle_x)
@@ -120,11 +141,15 @@ for i in range(len(points_3D)):
         dist_y = points_3D[i][1] - points_3D[i+nCorners_x][1]
         dist_x = points_3D[i][0] - points_3D[i+nCorners_x][0]
         scale_y = abs(dist/dist_y) # Scale in the corresponding (dist) units
-        angle_y = math.degrees(math.atan2(dist_y, dist_x))
+        angle_y = math.degrees(math.atan(dist_x/dist_y))
         distance["Y axis data"]["Reference point"] = i
         distance["Y axis data"]["Adjacent point"] = i+nCorners_x
         distance["Y axis data"]["distance"] = abs(dist_y)
         distance["Y axis data"]["Scale"] = scale_y
+        if version == '_mm':
+            error_distance = scale_y - 1.0000000
+            errors_distance_y.append(error_distance)
+            errors_distance_total.append(error_distance)
         distance["Y axis data"]["Angle"] = angle_y
         scales.append(scale_y)
         angles_y.append(angle_y)
@@ -143,6 +168,16 @@ measures["Measures"]["Scaling Factor"]["Standard deviation"] = statistics.stdev(
 measures["Measures"]["Scaling Factor"]["Max. value"] = max(scales)
 measures["Measures"]["Scaling Factor"]["Min. value"] = min(scales)
 
+measures["Measures"]["Error distance between reconstructed values and real ones in the X-axis"]["Mean"] = statistics.mean(errors_distance_x)
+measures["Measures"]["Error distance between reconstructed values and real ones in the X-axis"]["Standard deviation"] = statistics.stdev(errors_distance_x)
+measures["Measures"]["Error distance between reconstructed values and real ones in the X-axis"]["Max. value"] = max(errors_distance_x)
+measures["Measures"]["Error distance between reconstructed values and real ones in the X-axis"]["Min. value"] = min(errors_distance_x)
+
+measures["Measures"]["Error distance between reconstructed values and real ones in the Y-axis"]["Mean"] = statistics.mean(errors_distance_y)
+measures["Measures"]["Error distance between reconstructed values and real ones in the Y-axis"]["Standard deviation"] = statistics.stdev(errors_distance_y)
+measures["Measures"]["Error distance between reconstructed values and real ones in the Y-axis"]["Max. value"] = max(errors_distance_y)
+measures["Measures"]["Error distance between reconstructed values and real ones in the Y-axis"]["Min. value"] = min(errors_distance_y)
+
 measures["Measures"]["Angles in x axis"]["Mean"] = statistics.mean(angles_x)
 measures["Measures"]["Angles in x axis"]["Standard deviation"] = statistics.stdev(angles_x)
 measures["Measures"]["Angles in x axis"]["Max. value"] = max(angles_x)
@@ -158,22 +193,52 @@ with open(chess_measures_file, 'w') as pqs:
 pqs.close
 
 # Plot Scale info
-mean_scale = statistics.mean(scales)
-norm_scale = [value / mean_scale for value in scales]
+if version == '_mm':
+    norm_scale = errors_distance_total
+else:
+    mean_scale = statistics.mean(scales)
+    norm_scale = [value / mean_scale for value in scales]
 sns.histplot(norm_scale, kde=True, color='blue')
 hist, bin_edges = np.histogram(scales, bins='auto')
-print(bin_edges)
-plt.title('Scales distribution')
-plt.xlabel('Value')
+# print(bin_edges)
+if version == '_mm':
+    plt.title('Error distribution')
+    plt.xlabel('Error')
+else:
+    plt.title('Scales distribution')
+    plt.xlabel('Value')
 plt.ylabel('Density')
 plt.savefig(f'Results/Images/Statistics/Distribution_distance{version}.png')
 # plt.show()
 plt.close()
 
+if version == '_mm':
+    # Plot Error in x info
+    sns.histplot(errors_distance_x, kde=True, color='blue')
+    hist, bin_edges = np.histogram(scales, bins='auto')
+    # print(bin_edges)
+    plt.title('Error distance between reconstructed values and real ones in the X-axis')
+    plt.xlabel('Error')
+    plt.ylabel('Density')
+    plt.savefig(f'Results/Images/Statistics/Error_distance_x_{version}.png')
+    # plt.show()
+    plt.close()
+
+    # Plot Error in y info
+    sns.histplot(errors_distance_y, kde=True, color='blue')
+    hist, bin_edges = np.histogram(scales, bins='auto')
+    # print(bin_edges)
+    plt.title('Error distance between reconstructed values and real ones in the Y-axis')
+    plt.xlabel('Error')
+    plt.ylabel('Density')
+    plt.savefig(f'Results/Images/Statistics/Error_distance_y_{version}.png')
+    # plt.show()
+    plt.close()
+
 
 # Plot Angle x info
-psx_values = [abs(value) for value in angles_x]
-sns.histplot(psx_values, kde=True, color='blue')
+# psx_values = [abs(value) for value in angles_x]
+sns.histplot(angles_x, kde=True, color='blue')
 plt.title('Angles on the x-axis distribution')
 plt.xlabel('Value')
 plt.ylabel('Density')
@@ -182,8 +247,8 @@ plt.savefig(f'Results/Images/Statistics/Distribution_angles_x{version}.png')
 plt.close()
 
 # Plot Angle y info
-psy_values = [abs(value) for value in angles_y]
-sns.histplot(psy_values, kde=True, color='blue')
+# psy_values = [abs(value) for value in angles_y]
+sns.histplot(angles_y, kde=True, color='blue')
 plt.title('Angles on the y-axis distribution')
 plt.xlabel('Value')
 plt.ylabel('Density')
