@@ -20,15 +20,17 @@ with open('./config_file.yml', 'r') as config_file:
     config = yaml.safe_load(config_file)
 config_file.close
 
-# Path and files
+# Main Parameters & directories
+camera = config["camera"]
 main_path = config["working_path"]
 scene = f'{main_path}/{config["scene"]}'
-output_path = f'{scene}/{config["path"]}'
+output_path = f'{scene}/{config["out_path"]}'
+# App paths
 sfm_path = f'{output_path}/{config["sfm_data_scaled"]}'
-camera = config["camera"]
-savepath = f'{output_path}/{config["reprojection"]["path"]}'
+savepath = f'{output_path}/{config["reprojection_path"]}'
 os.makedirs(savepath, exist_ok=True)
-savename = f'{savepath}/{config["reprojection"]["file"]}'
+# App files
+savename = f'{savepath}/{config["reprojection_file"]}'
 
 with open(sfm_path, 'r') as recosntruction:
     sfm_data = json.load(recosntruction)
