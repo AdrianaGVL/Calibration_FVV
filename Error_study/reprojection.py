@@ -25,7 +25,6 @@ main_path = config["working_path"]
 scene = f'{main_path}/{config["scene"]}'
 output_path = f'{scene}/{config["path"]}'
 sfm_path = f'{output_path}/{config["sfm_data_scaled"]}'
-jsons_path = './jsons_structures.json'
 camera = config["camera"]
 savepath = f'{output_path}/{config["reprojection"]["path"]}'
 os.makedirs(savepath, exist_ok=True)

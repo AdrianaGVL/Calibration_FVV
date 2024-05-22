@@ -21,7 +21,7 @@ scene = f'{main_path}/{config["scene"]}'
 output_path = f'{scene}/{config["out_path"]}'
 frames_path = f'{scene}/{config["frames_folder"]}'
 savepath = f'{output_path}/matches_for_known'
-sfm_data_file = f'{output_path}/sfm_data.json'
+sfm_data_file = f'{output_path}/{config["sfm_data"]}'
 
 # All files
 feats_files = natsorted(glob.glob(f'{savepath}/*.feat'))

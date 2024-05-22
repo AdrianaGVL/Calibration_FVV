@@ -7,14 +7,23 @@
 # Script for ZED 2
 # Run in docker: ./dataset/ZED2.sh
 
-# Paths
+# Libraries
+# YAML
 if ! command -v yq &>/dev/null; then
   echo "Error: 'yq' command not found. Please install yq"
   echo "Linux example: sudo apt-get install yq"
   echo "macOS example: brew install yq"
   exit 1
 fi
+# JSON
+if ! command -v jq &>/dev/null; then
+  echo "Error: 'jq' command not found. Please install jq"
+  echo "Linux example: sudo apt-get install jq"
+  echo "macOS example: brew install jq"
+  exit 1
+fi
 
+# Paths
 config_file="../config_file.yml"
 
 MAIN=$(yq e '.working_path' "$config_file")
@@ -28,10 +37,11 @@ MYMATCHES=$OUTPUT/Reconstruction
 mkdir -p $RECONSTRUCTION
 
 # Initial intrinsic matrix (pixels)
-FX=$(yq e '.fx' "$config_file")
-FY=$(yq e '.fy' "$config_file")
-CX=$(yq e '.ppx' "$config_file")
-CY=$(yq e '.ppy' "$config_file")
+calibration_file=$SCENE/$(yq e '.calibration' "$config_file")
+FX=$(jq -r '.intrinsic.focal length left camera[0]' $calibration_file)
+FY=$(jq -r '.intrinsic.focal length left camera[1]' $calibration_file)
+CX=$(jq -r '.intrinsic.principal_point[0]' $calibration_file)
+CY=$(jq -r '.intrinsic.principal_point[1]' $calibration_file)
 K="$FX;0;$CX;0;$FY;$CY;0;0;1"
 
 # openMVG Execution

@@ -22,18 +22,31 @@ with open('./config_file.yml', 'r') as config_file:
     config = yaml.safe_load(config_file)
 config_file.close
 
-# Paths
+# Main Parameters & directories
 main_path = config["working_path"]
 scene = f'{main_path}/{config["scene"]}'
 output_path = f'{scene}/{config["out_path"]}'
-results_path=f'{output_path}/{config["plane_path"]}'
-sfm_data_file = f'{output_path}/{config["ckecker_path"]}/{config["checker_sfm_data"]}'
-chess_error_path = f'{results_path}/errors_chess_odr.json'
+# App paths
+known_reconst = f'{output_path}/{config["known_poses"]}'
+results_path = f'{output_path}/{config["plane_path"]}'
+# App files
+jsons_path = './jsons_structures.json'
+sfm_data_file = f'{known_reconst}/{config["known_sfm_data"]}'
+chess_error_path = f'{results_path}/{config["plane_file"]}'
 
 # Read the reconstruction data
 with open(sfm_data_file) as f:
     sfm_data = json.load(f)
 f.close
+
+# JSON Structure
+# Read the reconstruction data
+with open(jsons_path) as j:
+    json_model = json.load(j)
+j.close
+
+errors = json_model["Plane 3D"]
+point_err = json_model["Points_to_Plane"]
 
 points_3D = []
 for coords in sfm_data["structure"]:
@@ -57,22 +70,6 @@ model = Model(model_func)
 odr = ODR(data, model, beta0=coefss)
 odr_result = odr.run()
 A, B, C = odr_result.beta[:3]
-
-# JSON structure
-errors = {
-    "Plane equation": '',
-    "Error with respect to the plane":{
-        "Mean": '',
-        "Standard deviation": '',
-        "Max. value": '',
-        "Mix. value": ''
-    },
-    "Distance to the plane per point": []
-}
-point_err = {
-    "Point ID": '',
-    "Distance": ''
-}
 
 # Error
 errors["Plane equation"] = f"Plane equation: {A}x + {B}y + {C} = 0"

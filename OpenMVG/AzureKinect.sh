@@ -57,13 +57,6 @@ openMVG_main_ConvertSfM_DataFormat -i $RECONSTRUCTION/sfm_data.bin -o $RECONSTRU
 
 mv $RECONSTRUCTION/sfm_data.json $OUTPUT/sfm_data.json
 
-# Extra - The MVS files are the same but instead of points, triangles
-
-# 8. MVS conversion
-#echo '\n 8. Executing MVS conversion \n'
-#openMVG_main_openMVG2openMVS -i $RECONSTRUCTION/sfm_data.bin -o $MVS/scene.mvs -d $UNDISTOR
-
-#
 
 # Options per command
 # 1. Image Listing Options
