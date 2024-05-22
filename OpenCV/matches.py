@@ -8,14 +8,20 @@ import operator
 import glob
 from natsort import natsorted
 import json
+import yaml
+
+# Config file
+with open('./config_file.yml', 'r') as config_file:
+    config = yaml.safe_load(config_file)
+config_file.close
 
 # Paths
-main_path = '/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
-scene_path = f'{main_path}/Video_Chess_C'
-frames_path = f'{scene_path}/frames_I'
-results_path = f'{scene_path}/output_chiquito'
-savepath = f'{results_path}/matches_for_known'
-sfm_data_file = f'{results_path}/sfm_data.json'
+main_path = config["working_path"]
+scene = f'{main_path}/{config["scene"]}'
+output_path = f'{scene}/{config["out_path"]}'
+frames_path = f'{scene}/{config["frames_folder"]}'
+savepath = f'{output_path}/matches_for_known'
+sfm_data_file = f'{output_path}/sfm_data.json'
 
 # All files
 feats_files = natsorted(glob.glob(f'{savepath}/*.feat'))

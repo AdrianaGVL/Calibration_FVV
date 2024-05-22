@@ -10,24 +10,30 @@ import time
 import os
 from natsort import natsorted
 import numpy as np
+import yaml
+
+# Config file
+with open('./config_file.yml', 'r') as config_file:
+    config = yaml.safe_load(config_file)
+config_file.close
 
 # Paths
-main_path = '/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
-scene_path = f'{main_path}/Video_Chess_C'
-frames_path = f'{scene_path}/frames_I'
-results_path = f'{scene_path}/output_chiquito'
-drawn_corners_path = f'{results_path}/frames_with_corners'
+main_path = config["working_path"]
+scene = f'{main_path}/{config["scene"]}'
+output_path = f'{scene}/{config["out_path"]}'
+frames_path = f'{scene}/{config["frames_folder"]}'
+drawn_corners_path = f'{output_path}/frames_with_corners'
 
 # Save Images with drawn corners?
 img_with_corners = False
 img_corners_show = False    # Print every image with its drawn corners for 3s (can be change to wait key)
 
 # Number or corners along the x axes and y axes
-nCorners_x = 8
-nCorners_y = 6
+nCorners_x = config["num_corners_x"]
+nCorners_y = config["num_corners_y"]
 
 # Coordinates for test?
-features_path = f'{results_path}/matches_for_known'
+features_path = f'{output_path}/matches_for_known'
 os.makedirs(features_path, exist_ok=True)
 
 # List the images (frames in this case)

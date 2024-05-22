@@ -5,6 +5,7 @@
 
 # Libraries
 import json
+import yaml
 import numpy as np
 from scipy.odr import Model, Data, ODR
 import statistics
@@ -16,11 +17,17 @@ from mpl_toolkits.mplot3d import Axes3D
 interactive_plot = False
 
 # Paths
-scene = 'Video_Chess_D'
-main_path = '/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
-scene_path = f'{main_path}/{scene}'
-results_path = f'{scene_path}/output'
-sfm_data_file = f'{results_path}/Reconstruction_for_known/cloud_and_poses.json'
+# Config file
+with open('./config_file.yml', 'r') as config_file:
+    config = yaml.safe_load(config_file)
+config_file.close
+
+# Paths
+main_path = config["working_path"]
+scene = f'{main_path}/{config["scene"]}'
+output_path = f'{scene}/{config["out_path"]}'
+results_path=f'{output_path}/{config["plane_path"]}'
+sfm_data_file = f'{output_path}/{config["ckecker_path"]}/{config["checker_sfm_data"]}'
 chess_error_path = f'{results_path}/errors_chess_odr.json'
 
 # Read the reconstruction data
@@ -50,10 +57,6 @@ model = Model(model_func)
 odr = ODR(data, model, beta0=coefss)
 odr_result = odr.run()
 A, B, C = odr_result.beta[:3]
-
-# # Regression LS
-# coefficients, _, _, _ = np.linalg.lstsq(X, points[:, 2], rcond=None)
-# A, B, C = coefficients[:3]
 
 # JSON structure
 errors = {

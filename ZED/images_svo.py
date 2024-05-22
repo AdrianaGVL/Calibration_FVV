@@ -34,7 +34,8 @@ import copy
 import math
 import cv2
 import argparse 
-import os 
+import os
+import json 
 
 def progress_bar(percent_done, bar_length=50):
     #Display progress bar
@@ -47,9 +48,9 @@ def progress_bar(percent_done, bar_length=50):
 zed_depth = {
     "ZED Model": '',
     "ZED Serial Number": '',
+    "Recording fps": '',
     "root_path": '',
-    "intrinsic": [],
-    "structure": []
+    "intrinsic": []
 }
 
 intrisics = {
@@ -60,35 +61,16 @@ intrisics = {
     "disto_k3": []
 }
 
-point_cloud_points = {
-    "key": '',
-    "coordinates": []
-}
-
     
 def main():
-    # Obtain claibration parameters
-    zed_info = zed.get_camera_information()
-    zed_depth["ZED Model"] = "{0}".format(zed_info.camera_model)
-    zed_depth["ZED Serial Number"] = "{0}".format(zed_info.serial_number)
-    intrisics["width"] = zed_info.camera_configuration.resolution.width
-    intrisics["height"] = zed_info.camera_configuration.resolution.height
-    calibration_params = zed_info.camera_configuration.calibration_parameters
-    intrisics["principal_point"].append(calibration_params.left_cam.cx)
-    intrisics["principal_point"].append(calibration_params.left_cam.cy)
-    intrisics["focal length left camera"].append(calibration_params.left_cam.fx)
-    intrisics["focal length left camera"].append(calibration_params.left_cam.fy)
-    intrisics["disto_k3"] = calibration_params.left_cam.disto
-    zed_depth["intrinsic"].append(copy.deepcopy(intrisics))
-
     # Create a InitParameters object and set configuration parameters
     filepath = opt.input_svo_file # Path to the .svo file to be playbacked
     zed_depth["root_path"] = filepath
     output_path = opt.output_path
     os.makedirs(output_path, exist_ok=True)
-    colour_path = f'{output_path}/colour_frames'
+    colour_path = output_path +'/colour_frames'
     os.makedirs(colour_path, exist_ok=True)
-    depth_path = f'{output_path}/depth_frames'
+    depth_path = output_path +'/depth_frames'
     os.makedirs(depth_path, exist_ok=True)
     input_type = sl.InputType()
     input_type.set_from_svo_file(filepath)  #Set init parameter to run from the .svo 
@@ -100,19 +82,35 @@ def main():
     if status != sl.ERROR_CODE.SUCCESS: #Ensure the camera opened succesfully 
         print("Camera Open", status, "Exit program.")
         exit(1)
-
-    # Set a maximum resolution, for visualisation confort 
-    resolution = zed.get_camera_information().camera_configuration.resolution
     
     runtime = sl.RuntimeParameters()
     
     image = sl.Mat()
     depth = sl.Mat()
-    # point_cloud = sl.Mat()
-
-    svo_frame_rate = zed.get_init_parameters().camera_fps
+    
     nb_frames = zed.get_svo_number_of_frames()
     print("[Info] SVO contains " ,nb_frames," frames")
+
+    # Obtain claibration parameters
+    zed_info = zed.get_camera_information()
+    zed_depth["ZED Model"] = "{0}".format(zed_info.camera_model)
+    zed_depth["ZED Serial Number"] = "{0}".format(zed_info.serial_number)
+    zed_depth["Recording fps"] = zed.get_init_parameters().camera_fps
+    intrisics["width"] = zed_info.camera_configuration.resolution.width
+    intrisics["height"] = zed_info.camera_configuration.resolution.height
+    calibration_params = zed_info.camera_configuration.calibration_parameters
+    intrisics["principal_point"].append(calibration_params.left_cam.cx)
+    intrisics["principal_point"].append(calibration_params.left_cam.cy)
+    intrisics["focal length left camera"].append(calibration_params.left_cam.fx)
+    intrisics["focal length left camera"].append(calibration_params.left_cam.fy)
+    dist = calibration_params.left_cam.disto
+    for value in dist:
+        intrisics["disto_k3"].append(value)
+    zed_depth["intrinsic"].append(copy.deepcopy(intrisics))
+
+    with open (output_path + '/zed_data.json', 'w') as zi:
+        json.dump(zed_depth, zi, indent=4)
+    zi.close
     
     while True:  # for 'q' key
         err = zed.grab(runtime)
@@ -125,38 +123,18 @@ def main():
             cv2.waitKey(10)
             cv2.imshow("Depth View", depth.get_data()) #dislay depth image to cv2
             cv2.waitKey(10)
-            left_path = f'{colour_path}/colour_{svo_position}.png'
-            dep_path = f'{depth_path}/depth_{svo_position}.tiff'
+            left_path = colour_path +'/colour_' + str(svo_position) + '.png'
+            dep_path = depth_path +'/depth_' + str(svo_position) + '.png'
             img = image.write(left_path)
             dep = depth.write(dep_path)
             if img == sl.ERROR_CODE.SUCCESS:
                 print("Saved image : ",left_path)
             else:
-                print(f'Something wrong happened in image {svo_position} saving... ')
+                print("Something wrong happened with image ",svo_position)
             if dep == sl.ERROR_CODE.SUCCESS:
                 print("Saved depth : ",dep_path)
             else:
-                print(f'Something wrong happened in depth {svo_position} saving... ')
-
-            # # Point Cloud
-            # zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA)
-            # ply_path = f'{output_path}/zed_point_cloud.ply'
-            # point_cloud.write(ply_path);
-
-            # # JSON info
-            # error, point_cloud_value = point_cloud.get_value(x, y)
-            # x = point_cloud_value[0]
-            # y = point_cloud_value[1]
-            # z = point_cloud_value[2]
-
-            # # Distance to an object
-            # if math.isfinite(point_cloud_value[2]):
-            #     distance = distance = math.sqrt(point_cloud_value[0] * point_cloud_value[0] + 
-            #                                     point_cloud_value[1] * point_cloud_value[1] + 
-            #                                     point_cloud_value[2] * point_cloud_value[2])
-            #     print(f"Distance to Camera at {{{x};{y}}}: {distance}")
-            # else : 
-            #     print(f"The distance can not be computed at {{{x};{y}}}")
+                print('Something wrong happened in depth ', svo_position)
 
         elif err == sl.ERROR_CODE.END_OF_SVOFILE_REACHED: #Check if the .svo has ended
             progress_bar(100, 30) 

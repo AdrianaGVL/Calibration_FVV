@@ -4,6 +4,8 @@
 #  Author: Adriana GV
 #######################
 
+#!/bin/bash
+
 # Paths
 MAIN='/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
 SCENE=$MAIN'/Video_Chess_C'

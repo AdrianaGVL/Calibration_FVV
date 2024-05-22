@@ -5,24 +5,34 @@
 
 # Libraries
 import json
+import yaml
 import statistics
 import math
 import copy
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
 import cv2
 import numpy as np
 
-# Paths
-scene = 'Video_Chess_D'
-camera = 'Azure'
-version = '_mm' # Nothing ('') or '_mm'
-main_path = '/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
-scene_path = f'{main_path}/{scene}'
-results_path = f'{scene_path}/output'
-sfm_data_file = f'{results_path}/Reconstruction_for_known/cloud_and_poses{version}.json'
-chess_measures_file = f'{results_path}/measures_chess{version}_prueba.json'
-frame_path = f'{scene_path}/frames/frame_29.png'
+# Config file
+with open('./config_file.yml', 'r') as config_file:
+    config = yaml.safe_load(config_file)
+config_file.close
+
+# Main Paths
+camera = config["camera"]
+main_path = config["working_path"]
+scene = f'{main_path}/{config["scene"]}'
+output_path = f'{scene}/{config["out_path"]}'
+# App paths
+reconstruction_known = f'{output_path}/{config["ckecker_path"]}'
+scale_info = f'{output_path}/{config["scale_data"]}'
+os.makedirs(scale_info, exist_ok=True)
+# App files
+sfm_data_file = f'{reconstruction_known}/{config["checker_sfm_data"]}'
+chess_measures_file = f'{scale_info}/{config["measures_file"]}'
+version = ''
 
 # Number or corners along the x axes and y axes
 nCorners_x = 10
@@ -31,10 +41,10 @@ last = [nCorners_x * i for i in range(nCorners_y+1)]
 
 
 # Distance in real life (mm)
-if scene_path == f'{main_path}/Video_Chess_C':
+if scene == f'{main_path}/Video_Chess_C':
     dist = 28
-elif scene_path == f'{main_path}/Video_Chess_D':
-    dist = 301
+elif scene == f'{main_path}/Video_Chess_D':
+    dist = 101.6
 
 # JSON Structure
 measures = {
@@ -95,6 +105,7 @@ with open(sfm_data_file) as f:
 f.close
 
 points_3D = []
+num_points = len(sfm_data["structure"])
 for coords in sfm_data["structure"]:
     x_point = coords["value"]["X"][0]
     y_point = coords["value"]["X"][1]
@@ -168,15 +179,16 @@ measures["Measures"]["Scaling Factor"]["Standard deviation"] = statistics.stdev(
 measures["Measures"]["Scaling Factor"]["Max. value"] = max(scales)
 measures["Measures"]["Scaling Factor"]["Min. value"] = min(scales)
 
-measures["Measures"]["Error distance between reconstructed values and real ones in the X-axis"]["Mean"] = statistics.mean(errors_distance_x)
-measures["Measures"]["Error distance between reconstructed values and real ones in the X-axis"]["Standard deviation"] = statistics.stdev(errors_distance_x)
-measures["Measures"]["Error distance between reconstructed values and real ones in the X-axis"]["Max. value"] = max(errors_distance_x)
-measures["Measures"]["Error distance between reconstructed values and real ones in the X-axis"]["Min. value"] = min(errors_distance_x)
+if version == '_mm':
+    measures["Measures"]["Error distance between reconstructed values and real ones in the X-axis"]["Mean"] = statistics.mean(errors_distance_x)
+    measures["Measures"]["Error distance between reconstructed values and real ones in the X-axis"]["Standard deviation"] = statistics.stdev(errors_distance_x)
+    measures["Measures"]["Error distance between reconstructed values and real ones in the X-axis"]["Max. value"] = max(errors_distance_x)
+    measures["Measures"]["Error distance between reconstructed values and real ones in the X-axis"]["Min. value"] = min(errors_distance_x)
 
-measures["Measures"]["Error distance between reconstructed values and real ones in the Y-axis"]["Mean"] = statistics.mean(errors_distance_y)
-measures["Measures"]["Error distance between reconstructed values and real ones in the Y-axis"]["Standard deviation"] = statistics.stdev(errors_distance_y)
-measures["Measures"]["Error distance between reconstructed values and real ones in the Y-axis"]["Max. value"] = max(errors_distance_y)
-measures["Measures"]["Error distance between reconstructed values and real ones in the Y-axis"]["Min. value"] = min(errors_distance_y)
+    measures["Measures"]["Error distance between reconstructed values and real ones in the Y-axis"]["Mean"] = statistics.mean(errors_distance_y)
+    measures["Measures"]["Error distance between reconstructed values and real ones in the Y-axis"]["Standard deviation"] = statistics.stdev(errors_distance_y)
+    measures["Measures"]["Error distance between reconstructed values and real ones in the Y-axis"]["Max. value"] = max(errors_distance_y)
+    measures["Measures"]["Error distance between reconstructed values and real ones in the Y-axis"]["Min. value"] = min(errors_distance_y)
 
 measures["Measures"]["Angles in x axis"]["Mean"] = statistics.mean(angles_x)
 measures["Measures"]["Angles in x axis"]["Standard deviation"] = statistics.stdev(angles_x)
@@ -208,7 +220,7 @@ else:
     plt.title('Scales distribution')
     plt.xlabel('Value')
 plt.ylabel('Density')
-plt.savefig(f'Results/Images/Statistics/Distribution_distance{version}.png')
+plt.savefig(f'{scale_info}/Distribution_distance{version}.png')
 # plt.show()
 plt.close()
 
@@ -220,7 +232,7 @@ if version == '_mm':
     plt.title('Error distance between reconstructed values and real ones in the X-axis')
     plt.xlabel('Error')
     plt.ylabel('Density')
-    plt.savefig(f'Results/Images/Statistics/Error_distance_x_{version}.png')
+    plt.savefig(f'{scale_info}/Error_distance_x{version}.png')
     # plt.show()
     plt.close()
 
@@ -231,7 +243,7 @@ if version == '_mm':
     plt.title('Error distance between reconstructed values and real ones in the Y-axis')
     plt.xlabel('Error')
     plt.ylabel('Density')
-    plt.savefig(f'Results/Images/Statistics/Error_distance_y_{version}.png')
+    plt.savefig(f'{scale_info}/Error_distance_y{version}.png')
     # plt.show()
     plt.close()
 
@@ -242,7 +254,7 @@ sns.histplot(angles_x, kde=True, color='blue')
 plt.title('Angles on the x-axis distribution')
 plt.xlabel('Value')
 plt.ylabel('Density')
-plt.savefig(f'Results/Images/Statistics/Distribution_angles_x{version}.png')
+plt.savefig(f'{scale_info}/Distribution_angles_x{version}.png')
 # plt.show()
 plt.close()
 
@@ -252,7 +264,7 @@ sns.histplot(angles_y, kde=True, color='blue')
 plt.title('Angles on the y-axis distribution')
 plt.xlabel('Value')
 plt.ylabel('Density')
-plt.savefig(f'Results/Images/Statistics/Distribution_angles_y{version}.png')
+plt.savefig(f'{scale_info}/Distribution_angles_y{version}.png')
 # plt.show()
 plt.close()
 

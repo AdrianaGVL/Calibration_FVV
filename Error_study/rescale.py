@@ -5,15 +5,21 @@
 
 # Libraries
 import json
+import yaml
+
+# Config file
+with open('./config_file.yml', 'r') as config_file:
+    config = yaml.safe_load(config_file)
+config_file.close
 
 # Paths
-scene = 'Video_Chess_D'
-main_path = '/Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction'
-scene_path = f'{main_path}/{scene}'
-results_path = f'{scene_path}/output'
-sfm_data_file = f'{results_path}/Reconstruction_for_known/cloud_and_poses.json'
-chess_measures_file = f'{results_path}/measures_chess.json'
-rescale_file = f'{results_path}/cloud_and_poses_mm.json'
+main_path = config["working_path"]
+scene = f'{main_path}/{config["scene"]}'
+output_path = f'{scene}/{config["out_path"]}'
+sfm_data_file = f'{output_path}/{config["sfm_data"]}'
+scale_info = f'{output_path}/{config["scale_data"]}'
+rescale_file = f'{output_path}/{config["sfm_data_scaled"]}'
+chess_measures_file = f'{scale_info}/{config["measures_file"]}'
 
 # Read the reconstruction data
 with open(sfm_data_file) as f:
