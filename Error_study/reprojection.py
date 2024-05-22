@@ -26,10 +26,10 @@ main_path = config["working_path"]
 scene = f'{main_path}/{config["scene"]}'
 output_path = f'{scene}/{config["out_path"]}'
 # App paths
-sfm_path = f'{output_path}/{config["sfm_data_scaled"]}'
 savepath = f'{output_path}/{config["reprojection_path"]}'
 os.makedirs(savepath, exist_ok=True)
 # App files
+sfm_path = f'{output_path}/{config["sfm_data_scaled"]}'
 savename = f'{savepath}/{config["reprojection_file"]}'
 
 with open(sfm_path, 'r') as recosntruction:
@@ -106,7 +106,7 @@ plt.close()
 sns.histplot(pix_err_y, kde=True, color='blue')
 plt.title('Pixel error on the y-axis distribution')
 plt.xlabel('Value')
-plt.ylabel('Density')
+plt.ylabel('Density (nº points)')
 plt.savefig(f'{savepath}/pix_err_y.png')
 plt.close()
 

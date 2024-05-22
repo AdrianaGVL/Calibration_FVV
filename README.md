@@ -1,7 +1,5 @@
 # FVV CALIBRATION
 
-------------
-
 This project aims to study the depth estimation error of RGB-D cameras.
 
 * **Cameras:**
@@ -49,10 +47,14 @@ The following scheme uses the the variable's name used in *config_file.yml*.
 │   │   │   ├── plane_path
 │   │   │   │   ├── plane_file
 │   │   │   │   ├── *Some other results*
+│   │   │   ├── depth_path
+│   │   │   │   ├──depth_file
+│   │   │   │   ├── *Some other results*
 │   │   │   ├── sfm_data_no_info.json
 │   │   │   ├── sfm_data.json
 │   │   │   ├── sfm_data_scaled.json
 │   │   ├── calibration.json
 │   ├── scene2/
 │   ├── scene3/
+│   ├── ...
 ```
