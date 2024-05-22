@@ -1,0 +1,45 @@
+#######################
+#  Created on: May 16, 2024
+#  Author: Adriana GV
+#######################
+
+# Camera info
+camera: ZED 2
+
+# Main paths
+working_path: /Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction
+scene: Video_Chess_D
+frames_folder: colour_frames
+depth_frames_folder: depth_frames
+
+# Select_frames script variable
+frames_to_rm: 2
+
+# Corners info script variable
+num_corners_x: 10
+num_corners_y: 5
+length_unit: 128  # This is the SIFT method length. If SURF is used, 64
+dist_mm: 101.6  # CheckerBoard C building is 28 mm
+
+
+
+# BETTER NOT TOUCH (Files & directries structutre)
+# Camera info
+calibration: zed_data.json
+# Outputs paths & files
+out_path: output
+sfm_data_scaled: sfm_data_scaled.json
+sfm_data: sfm_data.json
+# Checker Reconstruction (Known Poses)
+known_poses: Reconstruction_for_known
+scale_data: rescale_data
+known_sfm_data: cloud_and_poses.json
+measures_file: measures_data.json
+scales_file: scale_data.json
+# Error Study directories & files (Usually inside output directory)
+reprojection_path: reprojection
+reprojection_file: reproyection_study.json
+plane_path: plane_3D
+plane_file: plane_data.json
+depth_path: depth_study
+depth_file: depth_study.json

@@ -1,10 +1,9 @@
 .idea/
 .vscode/
+versions.py
 OpenMVG/360camera.sh
 OpenMVG/iPhoneXSCamera.sh
 OpenMVG/iPhoneXSCamera_KnownPoses.sh
 utils_bash/frames_video.sh
 ZED/images_gpu.py
-pipeline.sh
-config_file.yml
 jsons_structures.json
