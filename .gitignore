@@ -6,4 +6,3 @@ OpenMVG/iPhoneXSCamera.sh
 OpenMVG/iPhoneXSCamera_KnownPoses.sh
 utils_bash/frames_video.sh
 ZED/images_gpu.py
-jsons_structures.json

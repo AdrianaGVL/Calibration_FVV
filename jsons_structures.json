@@ -1,0 +1,89 @@
+{
+    "Scales": {
+        "Scene": null,
+        "Scaling Factor":{
+            "Mean": null,
+            "Standard deviation": null,
+            "Max. value": null,
+            "Min. value": null
+        },
+        "Measures per point": []
+    },
+
+    "Scale_info": {
+        "X axis data":{
+            "Reference point": null,
+            "Adjacent point": null,
+            "Scale": null
+        },
+        "Y axis data":{
+            "Reference point": null,
+            "Adjacent point": null,
+            "Scale": null
+        }
+    },
+
+    "Measures":{
+        "Scene": null,
+        "Measures":{
+            "Error distance between reconstructed values and real ones in the X-axis":{
+                "Mean": null,
+                "Standard deviation": null,
+                "Max. value": null,
+                "Min. value": null
+            },
+            "Error distance between reconstructed values and real ones in the Y-axis":{
+                "Mean": null,
+                "Standard deviation": null,
+                "Max. value": null,
+                "Min. value": null
+            },
+            "Angles in x axis":{
+                "Mean": null,
+                "Standard deviation": null,
+                "Max. value": null,
+                "Min. value": null
+            },
+            "Angles in y axis":{
+                "Mean": null,
+                "Standard deviation": null,
+                "Max. value": null,
+                "Min. value": null
+            }
+        },
+        "Measures per point": []
+    },
+    
+    "Distance_info": {
+        "X axis data":{
+            "Reference point": null,
+            "Adjacent point": null,
+            "distance" : null,
+            "error in distance": null,
+            "Angle": null
+        },
+        "Y axis data":{
+            "Reference point": null,
+            "Adjacent point": null,
+            "distance" : null,
+            "error in distance": null,
+            "Angle": null
+        }
+    },
+
+    "Plane 3D": {
+        "Plane equation": null,
+        "Error with respect to the plane":{
+            "Mean": null,
+            "Standard deviation": null,
+            "Max. value": null,
+            "Mix. value": null
+        },
+        "Distance to the plane per point": []
+    },
+
+    "Points_to_Plane": {
+        "Point ID": null,
+        "Distance": null
+    }
+}
