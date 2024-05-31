@@ -8,7 +8,7 @@ camera: ZED 2
 
 # Main paths
 working_path: /Users/agv/Estudios/Universidad/Máster/TFM/3D_Reconstruction
-scene: Video_Chess_D
+scene: sala_cameras
 frames_folder: colour_frames
 depth_frames_folder: depth_frames
 
