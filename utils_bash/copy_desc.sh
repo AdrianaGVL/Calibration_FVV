@@ -1,10 +1,9 @@
+#!/bin/bash
+
 #######################
-#  Script for copy 6144 bytes OpenMVG .desc files
 #  Created on: March 18, 2024
 #  Author: Adriana GV
 #######################
-
-#!/bin/bash
 
 # Paths
 if ! command -v yq &>/dev/null; then
@@ -14,18 +13,18 @@ if ! command -v yq &>/dev/null; then
   exit 1
 fi
 
-config_file="../config_file.yml"
+config_file=$1
 
-MAIN=$(yq e '.working_path' "$config_file")
-SCENE=$MAIN/$(yq e '.scene' "$config_file")
-OUTPUT=$SCENE/$(yq e '.out_path' "$config_file")
+MAIN=$(yq r $config_file "working_path")
+SCENE=$MAIN/$(yq r $config_file "scene")
+OUTPUT=$SCENE/$(yq r $config_file "out_path")
 MATCHES=$OUTPUT'/matches'
 MYMATCHES=$OUTPUT/matches_for_known
 
 # Bytes needed
-num_corners_x=$(yq e '.num_corners_x' "$config_file")
-num_corners_y=$(yq e '.num_corners_y' "$config_file")
-bytes_per_corner=$(yq e '.length_unit' "$config_file")
+num_corners_x=$(yq r $config_file "num_corners_x" )
+num_corners_y=$(yq r $config_file "num_corners_y")
+bytes_per_corner=$(yq r $config_file "length_unit")
 num_corners=$(($num_corners_x * $num_corners_y))
 num_bytes=$(($bytes_per_corner * $num_corners))
 

@@ -4,6 +4,7 @@
 #######################
 
 #Libraries
+import sys
 import cv2
 import glob
 import time
@@ -13,7 +14,8 @@ import numpy as np
 import yaml
 
 # Config file
-with open('./config_file.yml', 'r') as config_file:
+config_f =  sys.argv[1]
+with open(config_f, 'r') as config_file:
     config = yaml.safe_load(config_file)
 config_file.close
 

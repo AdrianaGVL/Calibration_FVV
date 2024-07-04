@@ -1,4 +1,21 @@
 {
+
+    "Camera_info": {
+        "Model": null,
+        "Serial Number": null,
+        "Recording fps": null,
+        "root_path": null,
+        "intrinsic": []
+    },
+    
+   "Intrisic_params": {
+        "width": null,
+        "height": null,
+        "focal length left camera": [],
+        "principal_point": [],
+        "disto_k3": []
+    },
+
     "Scales": {
         "Scene": null,
         "Scaling Factor":{
@@ -85,5 +102,16 @@
     "Points_to_Plane": {
         "Point ID": null,
         "Distance": null
+    },
+
+    "Floor_Extrinsics":{
+        "Left_cams": []
+    },
+
+    "Cam_Extrinsic":{
+        "Model": null,
+        "SN": null,
+        "R": null,
+        "t": null
     }
 }

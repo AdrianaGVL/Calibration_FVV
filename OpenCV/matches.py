@@ -5,13 +5,15 @@
 
 #Libraries
 import operator
+import sys
 import glob
 from natsort import natsorted
 import json
 import yaml
 
 # Config file
-with open('./config_file.yml', 'r') as config_file:
+config_f =  sys.argv[1]
+with open(config_f, 'r') as config_file:
     config = yaml.safe_load(config_file)
 config_file.close
 

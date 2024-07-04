@@ -6,6 +6,8 @@
 # Libraries
 import json
 import yaml
+import os
+import sys
 import numpy as np
 from scipy.odr import Model, Data, ODR
 import statistics
@@ -18,7 +20,8 @@ interactive_plot = False
 
 # Paths
 # Config file
-with open('./config_file.yml', 'r') as config_file:
+config_f =  sys.argv[1]
+with open(config_f, 'r') as config_file:
     config = yaml.safe_load(config_file)
 config_file.close
 
@@ -29,6 +32,7 @@ output_path = f'{scene}/{config["out_path"]}'
 # App paths
 known_reconst = f'{output_path}/{config["known_poses"]}'
 results_path = f'{output_path}/{config["plane_path"]}'
+os.makedirs(results_path, exist_ok=True)
 # App files
 jsons_path = './jsons_structures.json'
 sfm_data_file = f'{known_reconst}/{config["known_sfm_data"]}'

@@ -4,6 +4,7 @@
 #######################
 
 # Libraries
+import os
 import json
 import yaml
 import statistics
@@ -13,9 +14,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import cv2
 import numpy as np
+import sys
+sys.path.append(os.getcwd())
+from utils_py import analysis_tools as aly
 
 # Config file
-with open('./config_file.yml', 'r') as config_file:
+config_f =  sys.argv[1]
+with open(config_f, 'r') as config_file:
     config = yaml.safe_load(config_file)
 config_file.close
 
@@ -25,10 +30,10 @@ main_path = config["working_path"]
 scene = f'{main_path}/{config["scene"]}'
 output_path = f'{scene}/{config["out_path"]}'
 # App paths
-sfm_data_file = f'{output_path}/{config["sfm_data_scaled"]}'
 results_path = f'{output_path}/{config["scale_data"]}'
 # App files
 jsons_path = './jsons_structures.json'
+sfm_data_file = f'{output_path}/{config["scaled_known_sfm_data"]}'
 measures_file = f'{results_path}/{config["measures_file"]}'
 
 # Number or corners along the x axes and y axes
@@ -37,7 +42,9 @@ nCorners_y = config["num_corners_y"]
 last = [nCorners_x * i for i in range(nCorners_y+1)]
 
 # Distance in real life (mm)
-dist = config["dist_mm"]
+dist_chess = config["dist_mm"]
+dist_xchess = aly.eu_dis([0, 0, 0], [dist_chess, 0, 0])
+dist_ychess = aly.eu_dis([0, 0, 0], [0, dist_chess, 0])
 
 # JSON Structure
 # Read the reconstruction data
@@ -55,11 +62,18 @@ f.close
 
 points_3D = []
 num_points = len(sfm_data["structure"])
-for coords in sfm_data["structure"]:
-    x_point = coords["value"]["X"][0]
-    y_point = coords["value"]["X"][1]
-    point_3D = (x_point, y_point)
-    points_3D.append(point_3D)
+key = 0
+while len(points_3D) != num_points:
+    for coords in sfm_data["structure"]:
+        if key == coords["key"]:
+            x_point = coords["value"]["X"][0]
+            y_point = coords["value"]["X"][1]
+            z_point = coords["value"]["X"][2]
+            point_3D = (x_point, y_point, z_point)
+            points_3D.append(point_3D)
+            key +=1
+        else:
+            continue
 
 errors_distance_x = []
 errors_distance_y = []
@@ -75,16 +89,16 @@ for i in range(len(points_3D)):
         # Distance error
         distance["X axis data"]["Reference point"] = i
         distance["X axis data"]["Adjacent point"] = i+1
-        dist_x = points_3D[i][0] - points_3D[i+1][0]
-        dist_y = points_3D[i][1] - points_3D[i+1][1]
-        distance["X axis data"]["distance"] = abs(dist_x)
-        error_x = abs(dist_x) - dist
+        dist_x = aly.eu_dis(points_3D[i], points_3D[i+1])
+        distance["X axis data"]["distance"] = dist_x
+        error_x = dist_x - dist_xchess
         distance["X axis data"]["error in distance"] = error_x
         errors_distance_x.append(error_x)
         errors_distance_total.append(error_x)
 
         # Angles error
-        angle_x = math.degrees(math.atan(dist_y/dist_x)) # Will return a negative value if clockwise
+        angle = dist_chess/dist_x
+        angle_x = 45 - math.degrees(math.atan(angle))
         distance["X axis data"]["Angle"] = angle_x
         angles_x.append(angle_x)
     else:
@@ -99,16 +113,16 @@ for i in range(len(points_3D)):
         # Distance error
         distance["Y axis data"]["Reference point"] = i
         distance["Y axis data"]["Adjacent point"] = i+nCorners_x
-        dist_y = points_3D[i][1] - points_3D[i+nCorners_x][1]
-        dist_x = points_3D[i][0] - points_3D[i+nCorners_x][0]
-        distance["Y axis data"]["distance"] = abs(dist_y)
-        error_y = abs(dist_y) - dist
+        dist_y = aly.eu_dis(points_3D[i], points_3D[i+nCorners_x])
+        distance["Y axis data"]["distance"] = dist_y
+        error_y = dist_y - dist_ychess
         distance["Y axis data"]["error in distance"] = error_y
-        errors_distance_x.append(error_y)
+        errors_distance_y.append(error_y)
         errors_distance_total.append(error_y)
 
         # Angles error
-        angle_y = math.degrees(math.atan(dist_x/dist_y))
+        angle = dist_chess/dist_y
+        angle_y = 45 - math.degrees(math.atan(angle))
         distance["Y axis data"]["Angle"] = angle_y
         angles_y.append(angle_y)
     else:
@@ -118,27 +132,30 @@ for i in range(len(points_3D)):
         distance["Y axis data"]["distance"] = 'NaN'
         distance["Y axis data"]["Scale"] = 'NaN'
         distance["Y axis data"]["Angle"] = 'NaN'
-
+    
     measures["Measures per point"].append(copy.deepcopy(distance))
 
-
-measures["Measures"]["Error distance between reconstructed values and real ones in the X-axis"]["Mean"] = statistics.mean(errors_distance_x)
-measures["Measures"]["Error distance between reconstructed values and real ones in the X-axis"]["Standard deviation"] = statistics.stdev(errors_distance_x)
+statistics_errs_dist_x = [abs(value) for value in errors_distance_x]
+measures["Measures"]["Error distance between reconstructed values and real ones in the X-axis"]["Mean"] = statistics.mean(statistics_errs_dist_x)
+measures["Measures"]["Error distance between reconstructed values and real ones in the X-axis"]["Standard deviation"] = statistics.stdev(statistics_errs_dist_x)
 measures["Measures"]["Error distance between reconstructed values and real ones in the X-axis"]["Max. value"] = max(errors_distance_x)
 measures["Measures"]["Error distance between reconstructed values and real ones in the X-axis"]["Min. value"] = min(errors_distance_x)
 
-measures["Measures"]["Error distance between reconstructed values and real ones in the Y-axis"]["Mean"] = statistics.mean(errors_distance_y)
-measures["Measures"]["Error distance between reconstructed values and real ones in the Y-axis"]["Standard deviation"] = statistics.stdev(errors_distance_y)
+statistics_errs_dist_y = [abs(value) for value in errors_distance_y]
+measures["Measures"]["Error distance between reconstructed values and real ones in the Y-axis"]["Mean"] = statistics.mean(statistics_errs_dist_y)
+measures["Measures"]["Error distance between reconstructed values and real ones in the Y-axis"]["Standard deviation"] = statistics.stdev(statistics_errs_dist_y)
 measures["Measures"]["Error distance between reconstructed values and real ones in the Y-axis"]["Max. value"] = max(errors_distance_y)
 measures["Measures"]["Error distance between reconstructed values and real ones in the Y-axis"]["Min. value"] = min(errors_distance_y)
 
-measures["Measures"]["Angles in x axis"]["Mean"] = statistics.mean(angles_x)
-measures["Measures"]["Angles in x axis"]["Standard deviation"] = statistics.stdev(angles_x)
+statistics_angles_x = [abs(value) for value in angles_x]
+measures["Measures"]["Angles in x axis"]["Mean"] = statistics.mean(statistics_angles_x)
+measures["Measures"]["Angles in x axis"]["Standard deviation"] = statistics.stdev(statistics_angles_x)
 measures["Measures"]["Angles in x axis"]["Max. value"] = max(angles_x)
 measures["Measures"]["Angles in x axis"]["Min. value"] = min(angles_x)
 
-measures["Measures"]["Angles in y axis"]["Mean"] = statistics.mean(angles_y)
-measures["Measures"]["Angles in y axis"]["Standard deviation"] = statistics.stdev(angles_y)
+statistics_angles_y = [abs(value) for value in angles_y]
+measures["Measures"]["Angles in y axis"]["Mean"] = statistics.mean(statistics_angles_y)
+measures["Measures"]["Angles in y axis"]["Standard deviation"] = statistics.stdev(statistics_angles_y)
 measures["Measures"]["Angles in y axis"]["Max. value"] = max(angles_y)
 measures["Measures"]["Angles in y axis"]["Min. value"] = min(angles_y)
 
@@ -180,7 +197,7 @@ plt.close()
 # Plot Angle x info
 # psx_values = [abs(value) for value in angles_x]
 sns.histplot(angles_x, kde=True, color='blue')
-plt.title('Angles on the x-axis distribution')
+plt.title('Angle error distribution on the x-axis')
 plt.xlabel('Value (º)')
 plt.ylabel('Density (nº 3D points)')
 plt.savefig(f'{results_path}/Distribution_angles_x.png')
@@ -189,7 +206,7 @@ plt.close()
 # Plot Angle y info
 # psy_values = [abs(value) for value in angles_y]
 sns.histplot(angles_y, kde=True, color='blue')
-plt.title('Angles on the y-axis distribution')
+plt.title('Angle error distribution on the y-axis')
 plt.xlabel('Value (º)')
 plt.ylabel('Density (nº 3D points)')
 plt.savefig(f'{results_path}/Distribution_angles_y.png')

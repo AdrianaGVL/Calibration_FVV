@@ -1,11 +1,12 @@
+#!/bin/bash
+
 #######################
 #  Created on: March 18, 2024
 #  Author: Adriana GV
 #######################
 
 
-# Script for ZED 2
-# Run in docker: ./dataset/ZED2.sh
+# Script for camera
 
 # Libraries
 # YAML
@@ -24,7 +25,11 @@ if ! command -v jq &>/dev/null; then
 fi
 
 # Paths
-config_file="../config_file.yml"
+# config_file="/ZED/Calibration_FVV/config_file.yml"
+config_file=$1
+
+USER_ID=$(yq e '.user_id' "$config_file")
+GROUP_ID=$(yq e '.user_group' "$config_file")
 
 MAIN=$(yq e '.working_path' "$config_file")
 SCENE=$MAIN/$(yq e '.scene' "$config_file")
@@ -33,57 +38,61 @@ OUTPUT=$SCENE/$(yq e '.out_path' "$config_file")
 mkdir -p $OUTPUT
 MATCHES=$OUTPUT'/matches'
 mkdir -p $MATCHES
-MYMATCHES=$OUTPUT/Reconstruction
+RECONSTRUCTION=$OUTPUT/Reconstruction
 mkdir -p $RECONSTRUCTION
 
 # Initial intrinsic matrix (pixels)
 calibration_file=$SCENE/$(yq e '.calibration' "$config_file")
-FX=$(jq -r '.intrinsic.focal length left camera[0]' $calibration_file)
-FY=$(jq -r '.intrinsic.focal length left camera[1]' $calibration_file)
-CX=$(jq -r '.intrinsic.principal_point[0]' $calibration_file)
-CY=$(jq -r '.intrinsic.principal_point[1]' $calibration_file)
-K="$FX;0;$CX;0;$FY;$CY;0;0;1"
+fx=$(jq -r '.intrinsic[0]["focal length left camera"][0]' "$calibration_file")
+fy=$(jq -r '.intrinsic[0]["focal length left camera"][1]' "$calibration_file")
+cx=$(jq -r '.intrinsic[0]["principal_point"][0]' "$calibration_file")
+cy=$(jq -r '.intrinsic[0]["principal_point"][1]' "$calibration_file")
+K="$fx;0;$cx;0;$fy;$cy;0;0;1"
 
 # openMVG Execution
 # 1. Images Listing
-echo '\n 1. Executing Images Listing \n'
-openMVG_main_SfMInit_ImageListing -i $DATASET -k $K -o $OUTPUT  -g 1
+echo '1. Executing Images Listing'
+openMVG_main_SfMInit_ImageListing -i $DATASET -k $K -o $OUTPUT -c 1 -g 1
 
 mv $OUTPUT/sfm_data.json $OUTPUT/sfm_data_no_poses.json
 
 #2. Features Computation
-echo '\n 2. Executing Features Computation \n'
-openMVG_main_ComputeFeatures -i $OUTPUT/sfm_data_no_poses.json -o $MATCHES -m SIFT -f 1 -p HIGH -n 8
+echo '2. Executing Features Computation'
+openMVG_main_ComputeFeatures -i $OUTPUT/sfm_data_no_poses.json -o $MATCHES -m SIFT -p ULTRA -n 8
 
 # 3. Pair Generator
-echo ' \n 3. Executing Pair Generator \n'
+echo '3. Executing Pair Generator'
 openMVG_main_PairGenerator -i $OUTPUT/sfm_data_no_poses.json -o $MATCHES/pairs.bin -m EXHAUSTIVE
 
 # 4. Matches Computation
-echo '\n 4. Executing Matches Computation \n'
+echo '4. Executing Matches Computation'
 openMVG_main_ComputeMatches -i $OUTPUT/sfm_data_no_poses.json -o $MATCHES/matches.putative.bin -p $MATCHES/pairs.bin -n AUTO
 
 # 5. Geometric Filtering
-echo '\n 5. Executing Geometric Filtering \n'
+echo '5. Executing Geometric Filtering'
 openMVG_main_GeometricFilter -i $OUTPUT/sfm_data_no_poses.json -m $MATCHES/matches.putative.bin -o $MATCHES/matches.f.bin -p $MATCHES/pairs.bin
 
 # 6. Compute Structure from Motion
-echo '\n 6. Executing Strucuture from Motion \n'
-openMVG_main_SfM -i $OUTPUT/sfm_data_no_poses.json -m $MATCHES -o $RECONSTRUCTION -s GLOBAL -M $MATCHES/matches.f.bin
+echo '6. Executing Strucuture from Motion'
+openMVG_main_SfM -i $OUTPUT/sfm_data_no_poses.json -m $MATCHES -o $RECONSTRUCTION -s GLOBAL -f NONE -M $MATCHES/matches.f.bin
 
 # 7. New SfM data conversion to JSON
-echo '\n 7. Executing SfM data conversion to JSON \n'
+echo '7. Executing SfM data conversion to JSON'
 openMVG_main_ConvertSfM_DataFormat -i $RECONSTRUCTION/sfm_data.bin -o $RECONSTRUCTION/sfm_data.json
 
 mv $RECONSTRUCTION/sfm_data.json $OUTPUT/sfm_data.json
 
 # 8. Colorise Reconstrucion
-echo '\n 8. Executing Colouring Reconstruction'
+echo '8. Executing Colouring Reconstruction'
 openMVG_main_ComputeSfM_DataColor -i $OUTPUT/sfm_data.json -o $RECONSTRUCTION/cloud_and_poses_colour.ply
 
 # 9. MeshLab conversion
-echo '\n 9. Executing MeshLab Conversion'
+echo '9. Executing MeshLab Conversion'
 openMVG_main_openMVG2MESHLAB -i $OUTPUT/sfm_data.json -p $RECONSTRUCTION/cloud_and_poses_colour.ply -o $RECONSTRUCTION
+
+chown -R $USER_ID:$GROUP_ID $OUTPUT
+chown -R $USER_ID:$GROUP_ID $MATCHES
+chown -R $USER_ID:$GROUP_ID $RECONSTRUCTION
 
 # Options per command
 # 1. Image Listing Options

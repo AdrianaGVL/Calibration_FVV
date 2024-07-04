@@ -3,7 +3,6 @@
 #  Author: Adriana GV
 #######################
 
-
 # Script for Azure Kinect cameras
 
 # Paths

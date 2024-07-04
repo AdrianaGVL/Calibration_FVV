@@ -1,11 +1,13 @@
+#!/bin/bash
+
 #######################
 #  Created on: March 18, 2024
 #  Author: Adriana GV
 #######################
 
 
-# Script for ZED 2 from Known Poses
-# Run in docker: ./dataset/ZED2_Known.sh
+# Script for camera's Known Poses
+# Run in docker from root folder
 
 # Libraries
 # YAML
@@ -17,13 +19,16 @@ if ! command -v yq &>/dev/null; then
 fi
 
 # Paths
-config_file="../config_file.yml"
+# config_file="/ZED/Calibration_FVV/config_file.yml"
+config_file=$1
+
+USER_ID=$(yq e '.user_id' "$config_file")
+GROUP_ID=$(yq e '.user_group' "$config_file")
 
 MAIN=$(yq e '.working_path' "$config_file")
 SCENE=$MAIN/$(yq e '.scene' "$config_file")
 OUTPUT=$SCENE/$(yq e '.out_path' "$config_file")
-MYMATCHES=$OUTPUT'/matches_known'
-mkdir -p $MATCHES
+MYMATCHES=$OUTPUT'/matches_for_known'
 RECONSTRUCTION=$OUTPUT/$(yq e '.known_poses' "$config_file")
 mkdir -p $RECONSTRUCTION
 
@@ -43,6 +48,9 @@ openMVG_main_ComputeSfM_DataColor -i $RECONSTRUCTION/cloud_and_poses.json -o $RE
 echo '4. Executing MeshLab conversion'
 openMVG_main_openMVG2MESHLAB -i $RECONSTRUCTION/cloud_and_poses.json -p $RECONSTRUCTION/cloud_and_poses_colour.ply -o $RECONSTRUCTION
 
+# Change  
+chown -R $USER_ID:$GROUP_ID $OUTPUT
+chown -R $USER_ID:$GROUP_ID $RECONSTRUCTION
 
 # Options per command
 # 1. Compute Structure From Known Poses

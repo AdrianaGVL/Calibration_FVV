@@ -1,0 +1,11 @@
+#######################
+#  Created on: June 7, 2024
+#  Author: Adriana GV
+#######################
+
+# Main paths
+working_path: /home/agv/ZED/svo_scenes
+scene: pasillo_sofaa_3
+calibrations_folder: colour_frames
+captures_folder: colour_frames
+depth_frames_folder: depth_frames

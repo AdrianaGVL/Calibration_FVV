@@ -1,0 +1,44 @@
+#######################
+#  Created on: May 16, 2024
+#  Author: Adriana GV
+#######################
+
+# Camera info
+camera: ZED 2
+serial_num: 23542
+calibration: zed_data.json
+# Main paths
+working_path: /home/agv/ZED/svo_scenes/small_checker
+scene: sala_yo
+frames_folder: colour_frames
+depth_frames_folder: depth_frames
+# UID & GID
+user_id: 0
+user_group: 0
+# Select_frames script variable
+frames_to_rm: 2
+# Corners info script variable
+num_corners_x: 8
+num_corners_y: 6
+length_unit: 128 # This is the SIFT method length. If SURF is used, 64
+dist_mm: 28 # CheckerBoard C building is 28 mm
+# BETTER NOT TOUCH (Files & directries structutre)
+# Outputs paths & files
+out_path: output
+sfm_data_scaled: sfm_data_scaled.json
+sfm_data: sfm_data.json
+# Checker Reconstruction (Known Poses)
+known_poses: Reconstruction_for_known
+scale_data: rescale_data
+known_sfm_data: cloud_and_poses.json
+scaled_known_sfm_data: cloud_and_poses_scaled.json
+measures_file: measures_data.json
+scales_file: scale_data.json
+# Error Study directories & files (Usually inside output directory)
+reprojection_path: reprojection
+reprojection_file: reproyection_study.json
+plane_path: plane_3D
+plane_file: plane_data.json
+depth_path: depth_study
+depth_file: depth_study.json
+ratios_file: ratios_study.json

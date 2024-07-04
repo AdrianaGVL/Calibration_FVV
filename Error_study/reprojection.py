@@ -8,6 +8,7 @@
 # What will be manually computeated is the error.
 
 # Libraries
+import sys
 import numpy as np
 import json
 import yaml
@@ -16,7 +17,9 @@ import statistics
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-with open('./config_file.yml', 'r') as config_file:
+# Config file
+config_f =  sys.argv[1]
+with open(config_f, 'r') as config_file:
     config = yaml.safe_load(config_file)
 config_file.close
 
@@ -29,10 +32,12 @@ output_path = f'{scene}/{config["out_path"]}'
 savepath = f'{output_path}/{config["reprojection_path"]}'
 os.makedirs(savepath, exist_ok=True)
 # App files
+checker_sfm = f'{output_path}/{config["scaled_known_sfm_data"]}'
 sfm_path = f'{output_path}/{config["sfm_data_scaled"]}'
-savename = f'{savepath}/{config["reprojection_file"]}'
+# savename = f'{savepath}/{config["reprojection_file"]}'
+savename = f'{savepath}/{config["reprojection_file_checker"]}'
 
-with open(sfm_path, 'r') as recosntruction:
+with open(checker_sfm, 'r') as recosntruction:
     sfm_data = json.load(recosntruction)
 recosntruction.close
 
@@ -68,7 +73,8 @@ for poses in sfm_data["extrinsics"]:
                 # Create new variable in the sfm_data file
                 point["value"]["observations"][pos]["reprojection"] = {
                     "x": point_2d[:2].tolist(),
-                    "error": [diff_x, diff_y]
+                    "error": [diff_x, diff_y],
+                    # "mean error":statistics.mean([diff_x, diff_y])
                 }
                 pix_err_x.append(diff_x)
                 pix_err_y.append(diff_y)
@@ -78,15 +84,17 @@ for poses in sfm_data["extrinsics"]:
                 continue
 
 # Once the JSON is completed some statistics are computed
+statistics_error_x = [abs(value) for value in pix_err_x]
+statistics_error_y = [abs(value) for value in pix_err_y]
 sfm_data["Reprojection Statistics"] = {
-    "Mean error in x-axis (pixels)": statistics.mean(pix_err_x),
-    "Mean error in y-axis (pixels)": statistics.mean(pix_err_y),
-    "Error std in x-axis (pixels)": statistics.stdev(pix_err_x),
-    "Error std in y-axis (pixels)": statistics.stdev(pix_err_y),
-    "Max error in x-axis (pixels)": max(pix_err_x),
-    "Max error in y-axis (pixels)": max(pix_err_y),
-    "Min error in x-axis (pixels)": min(pix_err_x),
-    "Min error in y-axis (pixels)": min(pix_err_y)
+    "Mean error in x-axis (pixels)": statistics.mean(statistics_error_x),
+    "Mean error in y-axis (pixels)": statistics.mean(statistics_error_y),
+    "Error std in x-axis (pixels)": statistics.stdev(statistics_error_x),
+    "Error std in y-axis (pixels)": statistics.stdev(statistics_error_y),
+    "Max error in x-axis (pixels)": max(statistics_error_x),
+    "Max error in y-axis (pixels)": max(statistics_error_y),
+    "Min error in x-axis (pixels)": min(statistics_error_x),
+    "Min error in y-axis (pixels)": min(statistics_error_y)
 }
 
 print(f'Saving results in {savepath}')

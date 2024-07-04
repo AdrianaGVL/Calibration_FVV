@@ -12,7 +12,6 @@ import sys
 sys.path.append(os.getcwd())
 import math
 from tqdm import tqdm
-from Camera import depths_svo
 from utils_py import analysis_tools as aly
 from utils_py import visual_tools as vis
 
@@ -25,19 +24,23 @@ config_file.close
 camera = config["camera"]
 main_path = config["working_path"]
 scene = f'{main_path}/{config["scene"]}'
+depth_frames = f'{scene}/{config["depth_frames_folder"]}'
+colour_frames = f'{scene}/{config["frames_folder"]}'
 output_path = f'{scene}/{config["out_path"]}'
 # App paths
+reprojection_path = f'{output_path}/{config["reprojection_path"]}'
 savepath = f'{output_path}/{config["depth_path"]}'
+save_outliers = f'{output_path}/{config["depth_path"]}/outliers'
+save_for_regress = f'{main_path}/{config["calibration_path"]}'
 os.makedirs(savepath, exist_ok=True)
+# os.makedirs(save_outliers, exist_ok=True)
+os.makedirs(save_for_regress, exist_ok=True)
 # App files
 svo_file = f'{scene}/{config["svo_file"]}'
-sfm_info = f'{output_path}/{config["scaled_known_sfm_data"]}'
+reprojection_sfm = f'{reprojection_path}/{config["reprojection_file_checker"]}'
 savefile = f'{savepath}/{config["depth_file"]}'
 
-# Initialise depths
-depths_svo.init(svo_file)
-
-with open(sfm_info, 'r') as recosntruction:
+with open(reprojection_sfm, 'r') as recosntruction:
     sfm_data = json.load(recosntruction)
 recosntruction.close
 
@@ -58,7 +61,7 @@ nan_value = 0
 print(f'Running depth study for {len(sfm_data["structure"])} points')
 for point in tqdm(sfm_data["structure"]):
     pos = 0
-    if len(point["value"]["observations"]) < 5:
+    if len(point["value"]["observations"]) < 10:
         continue
     else:
         for feat in tqdm(point["value"]["observations"]):
@@ -69,14 +72,16 @@ for point in tqdm(sfm_data["structure"]):
                 if pose_id == pose["key"]:
                     R = np.array(pose["value"]["rotation"])
                     c = np.array(pose["value"]["center"])
-                    # Extract depthmap name
+                    # Load depth map
                     name_frame = filenames[match]
                     num_format = name_frame.split('_')
                     only_num = num_format[1].split('.')
+                    depth_frame_name = f'depth_{only_num[0]}.npy'
+                    depthmap = np.load(f'{depth_frames}/{depth_frame_name}')
                     # Is camera value valid?
                     coord_x = round(feat["value"]["x"][0])
                     coord_y = round(feat["value"]["x"][1])
-                    zed_depth = depths_svo.distance(only_num[0], coord_x, coord_y)
+                    zed_depth = depthmap.T[coord_x, coord_y]
                     if math.isnan(zed_depth) or math.isinf(zed_depth):
                         nan_value += 1
                     else:
@@ -84,7 +89,7 @@ for point in tqdm(sfm_data["structure"]):
                         # 3D point coordinates
                         cloud_point = np.array(point["value"]["X"])
                         translated_point = cloud_point - c
-                        # # # Reprojection Equations
+                        # # Reprojection Equations
                         point_in_pose = np.dot(R, translated_point)
                         mvg_dvalue = point_in_pose[2]
                         depth_error = zed_depth - mvg_dvalue
@@ -101,7 +106,7 @@ for point in tqdm(sfm_data["structure"]):
                 else:
                     continue
 
-depths_svo.close_zed()
+# zed.close()
 
 
 # # Outliers
@@ -117,8 +122,8 @@ for i in range(len(camera_depth)):
         clean_diff.append(depths_error[i])
 
 # Data save for post-processing
-# np.save(f'{save_for_regress}/{config["scene"]}_{camera}.npy', np.array(clean_cam))
-# np.save(f'{save_for_regress}/{config["scene"]}_mvgs.npy', np.array(clean_mvg))
+np.save(f'{save_for_regress}/{config["scene"]}_{camera}.npy', np.array(clean_cam))
+np.save(f'{save_for_regress}/{config["scene"]}_mvgs.npy', np.array(clean_mvg))
 
 # # Ratios
 r_cam_mvg_clean = aly.ratios(clean_cam, clean_mvg)

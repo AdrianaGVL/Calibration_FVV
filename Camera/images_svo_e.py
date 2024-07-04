@@ -1,5 +1,4 @@
 #######################
-#  Script for extracting files from an SVO file
 #  Created on: May 9, 2024
 #  Author: Adriana GV
 #######################
@@ -30,12 +29,10 @@
 """
 import sys
 import pyzed.sl as sl
-import copy
-import math
 import cv2
+import numpy as np
 import argparse 
 import os
-import json 
 
 def progress_bar(percent_done, bar_length=50):
     #Display progress bar
@@ -44,28 +41,11 @@ def progress_bar(percent_done, bar_length=50):
     sys.stdout.write('[%s] %i%s\r' % (bar, percent_done, '%'))
     sys.stdout.flush()
 
-# JSON structure
-zed_depth = {
-    "ZED Model": '',
-    "ZED Serial Number": '',
-    "Recording fps": '',
-    "root_path": '',
-    "intrinsic": []
-}
-
-intrisics = {
-    "width": '',
-    "height": '',
-    "focal length left camera": [],
-    "principal_point": [],
-    "disto_k3": []
-}
-
     
 def main():
     # Create a InitParameters object and set configuration parameters
     filepath = opt.input_svo_file # Path to the .svo file to be playbacked
-    zed_depth["root_path"] = filepath
+    filename = filepath.split('/')[-1].split('.')[0]
     output_path = opt.output_path
     os.makedirs(output_path, exist_ok=True)
     colour_path = output_path +'/colour_frames'
@@ -74,8 +54,8 @@ def main():
     os.makedirs(depth_path, exist_ok=True)
     input_type = sl.InputType()
     input_type.set_from_svo_file(filepath)  #Set init parameter to run from the .svo 
-    init = sl.InitParameters(input_t=input_type, svo_real_time_mode=False)
-    init.depth_mode = sl.DEPTH_MODE.ULTRA  # Use ULTRA depth mode
+    init = sl.InitParameters(input_t=input_type, svo_real_time_mode=False, camera_disable_self_calib=True)
+    init.depth_mode = sl.DEPTH_MODE.QUALITY  # New cameras (ZED2) use ULTRA depth mode | Old cameras (Previous firmware) use QUALITY
     init.coordinate_units = sl.UNIT.MILLIMETER  # Use meter units (for depth measurements)
     zed = sl.Camera()
     status = zed.open(init)
@@ -85,56 +65,63 @@ def main():
     
     runtime = sl.RuntimeParameters()
     
-    image = sl.Mat()
-    depth = sl.Mat()
+    imagel = sl.Mat()
+    imager = sl.Mat()
+    # depth = sl.Mat()
     
     nb_frames = zed.get_svo_number_of_frames()
     print("[Info] SVO contains " ,nb_frames," frames")
 
     # Obtain claibration parameters
     zed_info = zed.get_camera_information()
-    zed_depth["ZED Model"] = "{0}".format(zed_info.camera_model)
-    zed_depth["ZED Serial Number"] = "{0}".format(zed_info.serial_number)
-    zed_depth["Recording fps"] = zed.get_init_parameters().camera_fps
-    intrisics["width"] = zed_info.camera_configuration.resolution.width
-    intrisics["height"] = zed_info.camera_configuration.resolution.height
-    calibration_params = zed_info.camera_configuration.calibration_parameters
-    intrisics["principal_point"].append(calibration_params.left_cam.cx)
-    intrisics["principal_point"].append(calibration_params.left_cam.cy)
-    intrisics["focal length left camera"].append(calibration_params.left_cam.fx)
-    intrisics["focal length left camera"].append(calibration_params.left_cam.fy)
-    dist = calibration_params.left_cam.disto
-    for value in dist:
-        intrisics["disto_k3"].append(value)
-    zed_depth["intrinsic"].append(copy.deepcopy(intrisics))
+    model = ("{0}".format(zed_info.camera_model)).replace(" ", "")
+    sn = "{0}".format(zed_info.serial_number)
+    print("Extracting frames from camera model ",model," with serial number: ",sn)
+    nb_frames = zed.get_svo_number_of_frames()
+    fps = zed.get_init_parameters().camera_fps
+    print("[Info] SVO contains " ,nb_frames," frames at ",fps)
+    resolution = zed_info.camera_resolution
+    width = resolution.width
+    height = resolution.height
+    calibration_params = zed_info.camera_configuration.calibration_parameters_raw
 
-    with open (output_path + '/zed_data.json', 'w') as zi:
-        json.dump(zed_depth, zi, indent=4)
-    zi.close
-    
     while True:  # for 'q' key
         err = zed.grab(runtime)
         if err == sl.ERROR_CODE.SUCCESS:
             # Images
-            zed.retrieve_image(image,sl.VIEW.LEFT,sl.MEM.CPU) #retrieve image left
-            zed.retrieve_measure(depth, sl.MEASURE.DEPTH)
             svo_position = zed.get_svo_position()
-            cv2.imshow("Left View", image.get_data()) #dislay left image to cv2
-            cv2.waitKey(10)
-            cv2.imshow("Depth View", depth.get_data()) #dislay depth image to cv2
-            cv2.waitKey(10)
-            left_path = colour_path +'/colour_' + str(svo_position) + '.png'
-            dep_path = depth_path +'/depth_' + str(svo_position) + '.png'
-            img = image.write(left_path)
-            dep = depth.write(dep_path)
-            if img == sl.ERROR_CODE.SUCCESS:
+            left_path = colour_path +'/left' + str(svo_position) + '_' + model + '_' + sn + '.png'
+            rigth_path = colour_path +'/right' + str(svo_position) + '_' + model + '_' + sn + '.png'
+            # dep_path = depth_path +'/depth' + str(svo_position) + '_' + model + '_' + sn + '.npy'
+            # Save colour image
+            zed.retrieve_image(imagel,sl.VIEW.LEFT,sl.MEM.CPU) #retrieve image left
+            zed.retrieve_image(imager,sl.VIEW.RIGHT,sl.MEM.CPU)
+            imgl = imagel.write(left_path)
+            imgr = imager.write(rigth_path)
+            if imgl == sl.ERROR_CODE.SUCCESS:
                 print("Saved image : ",left_path)
             else:
-                print("Something wrong happened with image ",svo_position)
-            if dep == sl.ERROR_CODE.SUCCESS:
-                print("Saved depth : ",dep_path)
+                print("Something wrong happened with left image ",svo_position)
+            if imgr == sl.ERROR_CODE.SUCCESS:
+                print("Saved image : ",rigth_path)
             else:
-                print('Something wrong happened in depth ', svo_position)
+                print("Something wrong happened with rigth image ",svo_position)
+
+            # # Save depth image
+            # try:
+            #     zed.retrieve_measure(depth, sl.MEASURE.DEPTH)
+            #     depth_matrix = depth.get_data()
+            #     np.save(dep_path, depth_matrix)
+            #     print("Saved depth : ",dep_path)
+            # except:
+            #     print('Something wrong happened in depth ', svo_position)
+
+            with open (colour_path + '/lists.txt', 'a') as zi:
+                zi.write(f'left{str(svo_position)}{filename}.png;{width};{height};{calibration_params.left_cam.fx};0;{calibration_params.left_cam.cx};0;{calibration_params.left_cam.fy};{calibration_params.left_cam.cy};0;0;1\n')
+                zi.write(f'right{str(svo_position)}{filename}.png;{width};{height};{calibration_params.right_cam.fx};0;{calibration_params.right_cam.cx};0;{calibration_params.right_cam.fy};{calibration_params.right_cam.cy};0;0;1\n')
+            zi.close
+            break
+                
 
         elif err == sl.ERROR_CODE.END_OF_SVOFILE_REACHED: #Check if the .svo has ended
             progress_bar(100, 30) 

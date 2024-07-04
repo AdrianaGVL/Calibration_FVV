@@ -22,5 +22,5 @@ config_file="../config_file.yml"
 MAIN=$(yq e '.working_path' "$config_file")
 
 for SCENE in "$MAIN"/*/; do
-  ./dataset/ZED2.sh $SCENE
+  ./dataset/camera.sh $SCENE
 done

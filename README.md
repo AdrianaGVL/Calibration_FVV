@@ -1,5 +1,6 @@
 # FVV CALIBRATION
 
+***This branch is for working on the pepegotera computer.***
 This project aims to study the depth estimation error of RGB-D cameras.
 
 * **Cameras:**

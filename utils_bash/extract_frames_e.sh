@@ -1,11 +1,8 @@
-#!/bin/bash
-
 #######################
 #  Created on: May 16, 2024
 #  Author: Adriana GV
 #######################
 
-# Script for SVO2 Repearing files
 # Config file path
 config_file=$1
 
@@ -18,10 +15,9 @@ else
     SCENE=$MAIN/$(yq e '.scene' "$config_file")
 fi
 
-# Repair video in any case
 for VIDEO in $SCENE/*.{svo2,svo}; do
     if [ -f "$VIDEO" ]; then
-        cd /usr/local/zed/tools
-        ./ZED_SVO_Editor -repair $VIDEO
+        python3 ./Camera/images_svo_e.py --input_svo_file $VIDEO --output_path $SCENE
+        # rm $VIDEO
     fi
 done
