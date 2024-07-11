@@ -5,9 +5,8 @@ This project aims to study the depth estimation error of RGB-D cameras.
 
 * **Cameras:**
   * The cameras used in this project were:
-    * ZED 2 (Stereo Vision), from Stereolabs. This are the FVV Live system cameras.
-    * Azure Kinect (Time of Fligth sensor), from Microsoft. Can be use with in FVV Live system.
-    * Any other camera or system which returns colour and depth frames can be used if depth estimation error study is needed. Necessary data:
+    * ZED
+    * Necessary data:
       * Intrinsics (fx, fy, ppx, ppy) are needed, or at least, f. Look OpenMVG scripts.
       * Extrinsics (Camera poses)
 * **External software:**
