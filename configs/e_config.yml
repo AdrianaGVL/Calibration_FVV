@@ -3,26 +3,22 @@
 #  Author: Adriana GV
 #######################
 
-# Camera info
-camera: ZED 2
-serial_num: 23542
-calibration: zed_data.json
-# Main paths
-working_path: /home/agv/ZED/svo_scenes/small_checker
-scene: sala_yo
-frames_folder: colour_frames
-depth_frames_folder: depth_frames
-# UID & GID
-user_id: 0
-user_group: 0
-# Select_frames script variable
-frames_to_rm: 2
-# Corners info script variable
-num_corners_x: 8
-num_corners_y: 6
+
+# Configurable paths
+device_path: /media/agv/JesusGTI4/cam_sn127
+dockers_path: ZED
+# Configurable params -> Corners info script variable
+num_corners_x: 10
+num_corners_y: 5
 length_unit: 128 # This is the SIFT method length. If SURF is used, 64
-dist_mm: 28 # CheckerBoard C building is 28 mm
+dist_mm: 101.6 # CheckerBoard C building is 28 mm | D buildin is 101.6 mm
+
 # BETTER NOT TOUCH (Files & directries structutre)
+# Main paths
+working_path: /home/agv/ZED
+scene: all
+frames_folder: colour_frames
+depth_frames_folder: depths
 # Outputs paths & files
 out_path: output
 sfm_data_scaled: sfm_data_scaled.json
@@ -37,8 +33,13 @@ scales_file: scale_data.json
 # Error Study directories & files (Usually inside output directory)
 reprojection_path: reprojection
 reprojection_file: reproyection_study.json
+reprojection_file_checker: reproyection_study_checker.json
 plane_path: plane_3D
 plane_file: plane_data.json
-depth_path: depth_study
-depth_file: depth_study.json
-ratios_file: ratios_study.json
+calibration_path: Calibration
+err_params_file: DepthTransformationParameters.json
+image_list: lists.txt
+
+# Permisions changes for docker and PC -> UID & GID 
+user_id: 1016
+user_group: 1016

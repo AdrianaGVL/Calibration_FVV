@@ -3,27 +3,25 @@
 #  Author: Adriana GV
 #######################
 
-# Camera info
-camera: ZED
-serial_num: 23542
-calibration: zed_data.json
-# Ground Truth 
-# Main paths
-working_path: /media/agv/JesusGTI3/ZED_Recordings/svo
-scene: sala_yo
-frames_folder: colour_frames
-depth_frames_folder: depth_frames
-# UID & GID
-user_id: 1016
-user_group: 1016
-# Select_frames script variable
-frames_to_rm: 4
-# Corners info script variable
+# Configurable paths
+device_path: /home/agv/Calibration
+dockers_path: ZED
+# Configurable params -> Corners info script variable
 num_corners_x: 10
 num_corners_y: 5
 length_unit: 128 # This is the SIFT method length. If SURF is used, 64
 dist_mm: 101.6 # CheckerBoard C building is 28 mm | D buildin is 101.6 mm
-# BETTER NOT TOUCH (Files & directries structutre)
+# BETTER NOT TOUCH (Files & directories structutre)
+# Camera info
+camera: ZED
+serial_num: 23542
+calibration: zed_data.json
+svo_file: HD1080_SN23542_19-22-13.svo
+# Paths
+working_path: /media/agv/JesusGTI4/cam_sn127
+scene: sala_fvv
+frames_folder: colour_frames
+depth_frames_folder: depth_frames
 # Outputs paths & files
 out_path: output
 sfm_data_scaled: sfm_data_scaled.json
@@ -45,5 +43,9 @@ depth_path: depth_study
 depth_file: depth_study.json
 ratios_file: ratios_study.json
 calibration_path: Calibration
-err_params_file: DepthTransformationParameters.txt
-calib_file: synthesisConfiguration_original.yml
+err_params_file: DepthTransformationParameters.yml
+extrinsics_file: extrinsics.json
+# Permisions changes for docker and PC
+# UID & GID
+user_id: 0
+user_group: 0

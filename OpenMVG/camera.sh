@@ -5,7 +5,6 @@
 #  Author: Adriana GV
 #######################
 
-
 # Script for camera
 
 # Libraries
@@ -24,13 +23,13 @@ if ! command -v jq &>/dev/null; then
   exit 1
 fi
 
-# Paths
-# config_file="/ZED/Calibration_FVV/config_file.yml"
+# Config file
 config_file=$1
 
 USER_ID=$(yq e '.user_id' "$config_file")
 GROUP_ID=$(yq e '.user_group' "$config_file")
 
+# Paths
 MAIN=$(yq e '.working_path' "$config_file")
 SCENE=$MAIN/$(yq e '.scene' "$config_file")
 DATASET=$SCENE/$(yq e '.frames_folder' "$config_file")

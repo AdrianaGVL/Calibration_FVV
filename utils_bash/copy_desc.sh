@@ -5,7 +5,10 @@
 #  Author: Adriana GV
 #######################
 
-# Paths
+#!/bin/bash
+
+# Libraries
+# YAML
 if ! command -v yq &>/dev/null; then
   echo "Error: 'yq' command not found. Please install yq"
   echo "Linux example: sudo apt-get install yq"
@@ -13,8 +16,10 @@ if ! command -v yq &>/dev/null; then
   exit 1
 fi
 
+# Config file
 config_file=$1
 
+# Paths
 MAIN=$(yq r $config_file "working_path")
 SCENE=$MAIN/$(yq r $config_file "scene")
 OUTPUT=$SCENE/$(yq r $config_file "out_path")

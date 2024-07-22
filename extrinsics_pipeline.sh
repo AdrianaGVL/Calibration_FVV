@@ -21,11 +21,17 @@ if ! command -v jq &>/dev/null; then
 fi
 
 # Paths
-config_file=configs/config_file_e.yml
+config_file=$1
+configs=$(dirname "$config_file")
+new_config_file=$configs/config.yml
 working_code=$(basename $(pwd))
 MAIN=$(yq r $config_file "device_path")
 dockers_path=$(yq r $config_file "dockers_path")
 SCENE=$(yq r $config_file "scene")
+# Config file for code
+cat $config_file > $new_config_file
+config_file=$new_config_file
+
 
 ZED_SDK_V='v3'
 

@@ -78,13 +78,12 @@ def main():
         exit(1)
     
     image = sl.Mat()
-    depth = sl.Mat()
     
     nb_frames = zed.get_svo_number_of_frames()
     print("[Info] SVO contains " ,nb_frames," frames")
     final_frames = nb_frames
     lim_frames = 1
-    while final_frames > 800:
+    while final_frames > 900:
         lim_frames += 1
         final_frames = nb_frames / lim_frames
 

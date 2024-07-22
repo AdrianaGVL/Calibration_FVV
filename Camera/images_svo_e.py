@@ -67,7 +67,6 @@ def main():
     
     imagel = sl.Mat()
     imager = sl.Mat()
-    # depth = sl.Mat()
     
     nb_frames = zed.get_svo_number_of_frames()
     print("[Info] SVO contains " ,nb_frames," frames")
@@ -92,7 +91,6 @@ def main():
             svo_position = zed.get_svo_position()
             left_path = colour_path +'/left' + str(svo_position) + '_' + model + '_' + sn + '.png'
             rigth_path = colour_path +'/right' + str(svo_position) + '_' + model + '_' + sn + '.png'
-            # dep_path = depth_path +'/depth' + str(svo_position) + '_' + model + '_' + sn + '.npy'
             # Save colour image
             zed.retrieve_image(imagel,sl.VIEW.LEFT,sl.MEM.CPU) #retrieve image left
             zed.retrieve_image(imager,sl.VIEW.RIGHT,sl.MEM.CPU)
@@ -106,15 +104,6 @@ def main():
                 print("Saved image : ",rigth_path)
             else:
                 print("Something wrong happened with rigth image ",svo_position)
-
-            # # Save depth image
-            # try:
-            #     zed.retrieve_measure(depth, sl.MEASURE.DEPTH)
-            #     depth_matrix = depth.get_data()
-            #     np.save(dep_path, depth_matrix)
-            #     print("Saved depth : ",dep_path)
-            # except:
-            #     print('Something wrong happened in depth ', svo_position)
 
             with open (colour_path + '/lists.txt', 'a') as zi:
                 zi.write(f'left{str(svo_position)}{filename}.png;{width};{height};{calibration_params.left_cam.fx};0;{calibration_params.left_cam.cx};0;{calibration_params.left_cam.fy};{calibration_params.left_cam.cy};0;0;1\n')

@@ -15,8 +15,7 @@ utils_bash/Select_frames.sh
 utils_bash/extract_frames.sh
 ZED/images_gpu.py
 Error_study/__pycache__/
-Error_study/depth_from_np.py
+Error_study/ZED_parameterisation.py
 DL_method/
 utils_py/__pycache__/
 utils_py/remove_sys.py
-extrinsics_pipeline_copy.sh

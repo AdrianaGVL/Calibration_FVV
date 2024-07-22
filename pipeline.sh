@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Pipeline for chessboard recosntruction
 
 # Check the integrity of the videos
@@ -34,10 +36,15 @@ if ! command -v jq &>/dev/null; then
 fi
 
 # Paths
-config_file=configs/config_file.yml
+config_file=$1
+configs=$(dirname "$config_file")
+new_config_file=$configs/config.yml
 working_code=$(basename $(pwd))
 MAIN=$(yq r $config_file "device_path")
 dockers_path=$(yq r $config_file "dockers_path")
+# Config file for code
+cat $config_file > $new_config_file
+config_file=$new_config_file
 
 ZED_SDK_V='v3'
 
@@ -97,12 +104,12 @@ for SCENE in $MAIN/*.{svo2,svo}; do
   fi
 done
 
-# echo 'Error parameterisation'
-# python3 Error_study/sistematic_error.py $(pwd)/$config_file
-# echo 'Error Regression'
-# python3 Error_study/ZED_parameterisation_one_by_one.py $(pwd)/$config_file
-# echo 'Error correction study'
-# python3 Error_study/correct_depth_each.py $(pwd)/$config_file
+echo 'Error parameterisation'
+python3 Error_study/sistematic_error.py $(pwd)/$config_file
+echo 'Error Regression'
+python3 Error_study/ZED_parameterisation_one_by_one.py $(pwd)/$config_file
+echo 'Error correction study'
+python3 Error_study/correct_depth_each.py $(pwd)/$config_file
 
 yq w -i $config_file "user_id" 0
 yq w -i $config_file "user_group" 0
