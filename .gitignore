@@ -18,4 +18,3 @@ Error_study/ZED_parameterisation.py
 DL_method/
 utils_py/__pycache__/
 utils_py/remove_sys.py
-.gitignore
