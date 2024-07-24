@@ -53,7 +53,7 @@ echo 'Working directory: '$MAIN
 
 if [ "$ZED_SDK_V" == "v4" ]; then
   yq w -i $config_file "working_path" $dockers_path && \
-  docker exec ZED bash ./$dockers_path/$working_code/utils_bash/repair.sh /$dockers_path/$working_code/$config_file && \
+  docker exec ZED bash ./$dockers_path/$working_code/utils_bash/repair_e.sh /$dockers_path/$working_code/$config_file && \
   docker exec ZED bash ./$dockers_path/$working_code/utils_bash/extract_frames_e.sh /$dockers_path/$working_code/$config_file ;
   docker exec OPENMVG bash ./$dockers_path/$working_code/OpenMVG/poses.sh /$dockers_path/$working_code/$config_file ;
   yq w -i $config_file "working_path" $not_dockers_path

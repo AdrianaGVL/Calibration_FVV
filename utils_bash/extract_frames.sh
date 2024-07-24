@@ -5,12 +5,10 @@
 #  Author: Adriana GV
 #######################
 
-# Script for SVO2 Repearing files
-# Config file path
-config_file=$1
 
-USER_ID=$(yq e '.user_id' "$config_file")
-GROUP_ID=$(yq e '.user_group' "$config_file")
+# Config file path
+dockers_path=$1
+config_file=$2
 
 #Paths
 yq_v=$(yq --version 2>&1)
@@ -24,8 +22,7 @@ else
     VIDEO=$SCENE/$(yq e '.svo_file' "$config_file")
 fi
 
-# Repair video in any case
-cd /usr/local/zed/tools
-./ZED_SVO_Editor -repair $VIDEO
 
-chown -R $USER_ID:$GROUP_ID $VIDEO
+python3 $dockers_path/Camera/images_svo.py --input_svo_file $VIDEO --input_config_file $config_file
+
+chown -R $USER_ID:$GROUP_ID $SCENE

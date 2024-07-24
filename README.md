@@ -60,6 +60,8 @@ Each working directory is a camera, the working directory is named after the cam
 
 Due to some hardware and software limitations, the use of dockers was necessary in the computer used to develop this code. If this is not necessary, simply run each script without the docker paths.
 
+You should add your user to the docker group, look for documentation in the Docker API, this way you will be able to run the code without a password.
+
 ## Depth estimation study process
 
 The *pipeline.sh* script is prepared to run the entire depth estimation study. However, each script is prepared to work on its own if the required files are available.

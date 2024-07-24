@@ -1,0 +1,21 @@
+FROM nvidia/cuda:12.1.1-cudnn8-devel-ubuntu20.04
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install build-essential -y
+RUN apt-get update && apt-get -y install sudo
+RUN apt-get update && apt-get install nano -y
+RUN apt-get install -y git
+RUN apt-get update && apt-get install wget
+RUN apt-get update && apt-get install -y ffmpeg libsm6 libxext6
+RUN apt-get install -y vim curl iputils-ping python3-dev build-essential python3-pip libsm6
+RUN apt-get install -y libgtk2.0-dev
+RUN apt-get install -y pkg-config
+RUN apt-get install -y zstd
+RUN wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+RUN chmod +x /usr/bin/yq
+RUN wget https://download.stereolabs.com/zedsdk/4.1/cu121/ubuntu20 -O ZED_SDK_Ubuntu20_cuda12.1_v4.1.1.zstd.run
+RUN chmod +x ZED_SDK_Ubuntu20_cuda12.1_v4.1.1.zstd.run
+RUN sudo  ./ZED_SDK_Ubuntu20_cuda12.1_v4.1.1.zstd.run -- silent
+RUN pip install numpy \
+&& pip install opencv-python --verbose \
+&& pip install tqdm

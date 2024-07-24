@@ -45,8 +45,8 @@ dockers_path=$(yq r $config_file "dockers_path")
 # Config file for code
 cat $config_file > $new_config_file
 config_file=$new_config_file
-
-ZED_SDK_V='v3'
+# ZED SDK VERSION
+ZED_SDK_V=$(yq r $config_file "zed_sdk_v")
 
 if [ "$ZED_SDK_V" == 'v4' ]; then
   docker run -d -it --name ZED --rm -v $(yq r $config_file "device_path")/:/$(yq r $config_file "dockers_path")/ --gpus all -e NVIDIA_DRIVER_CAPABILITIES=video,compute,utility --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 zed_sdk_v4
@@ -69,9 +69,9 @@ for SCENE in $MAIN/*.{svo2,svo}; do
     echo 'Scene under study: '$scene_name
     if [ "$ZED_SDK_V" == "v4" ]; then
       yq w -i $config_file "working_path" $dockers_path && \
-      docker exec ZED bash ./$dockers_path/Calibration_FVV/utils_bash/repair.sh && \
-      docker exec ZED bash ./$dockers_path/Calibration_FVV/utils_bash/extract_frames.sh ;
-      docker exec OPENMVG bash ./$dockers_path/Calibration_FVV/OpenMVG/camera.sh /$dockers_path/$working_code/$config_file ;
+      docker exec ZED bash ./$dockers_path/$working_code/utils_bash/repair.sh /$dockers_path/$working_code/$config_file && \
+      docker exec ZED bash ./$dockers_path/$working_code/utils_bash/extract_frames.sh /$dockers_path/$working_code /$dockers_path/$working_code/$config_file;
+      docker exec OPENMVG bash ./$dockers_path/$working_code/OpenMVG/camera.sh /$dockers_path/$working_code/$config_file ;
       yq w -i $config_file "working_path" $MAIN/$(yq r $config_file "camera")_$(yq r $config_file "serial_num")
     else
       python3 Camera/images_svo.py --input_svo_file $SCENE --input_config_file $(pwd)/$config_file ;

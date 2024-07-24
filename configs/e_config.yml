@@ -7,6 +7,8 @@
 # Configurable paths
 device_path: /media/agv/JesusGTI4/cam_sn127
 dockers_path: ZED
+# Configurable ZED SDK version
+zed_sdk_v: v3 # If a higher SDK version is used, just change to v3 to v4
 # Configurable params -> Corners info script variable
 num_corners_x: 10
 num_corners_y: 5
